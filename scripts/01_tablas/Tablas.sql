@@ -1,3 +1,4 @@
+USE FacturacionSolucionesMagnificas;
 CREATE TABLE EMPRESAEMISORA (
     cedula              VARCHAR(20)     NOT NULL,
     nombre_comercial    VARCHAR(150)    NOT NULL,
@@ -117,4 +118,10 @@ CREATE TABLE AUDITORIASISTEMA (
 
     CONSTRAINT PK_AuditoriaSistema PRIMARY KEY (id_auditoria),
     CONSTRAINT CHK_Auditoria_Operacion CHECK (operacion IN ('INSERT', 'UPDATE', 'DELETE'))
+);
+CREATE TABLE TipoDocumento(
+    id_tipo_documento   INT     NOT NULL,
+    descripcion_tipo_documento VARCHAR(50) NOT NULL,
+
+    CONSTRAINT PK_TipoDocumento PRIMARY KEY (id_tipo_documento)
 );
