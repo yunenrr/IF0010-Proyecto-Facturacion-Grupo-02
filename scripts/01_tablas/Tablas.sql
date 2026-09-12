@@ -18,8 +18,8 @@ CREATE TABLE CLIENTE(
     direccion_contacto VARCHAR(50) NOT NULL,
     telefono VARCHAR(15) NOT NULL,
     correo VARCHAR(75) NOT NULL,
-    fecha_registro DATETIME NOT NULL DEFAULT GETDATE(),
-    ultima_actualizacion DATETIME NOT NULL DEFAULT GETDATE(),
+    fecha_registro DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    ultima_actualizacion DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
 
     CONSTRAINT PK_Cliente PRIMARY KEY(cedula)
 );
