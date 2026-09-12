@@ -1,4 +1,4 @@
-CREATE TABLE EmpresaEmisora (
+CREATE TABLE EMPRESAEMISORA (
     cedula              VARCHAR(20)     NOT NULL,
     nombre_comercial    VARCHAR(150)    NOT NULL,
     razon_social        VARCHAR(150)    NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE EmpresaEmisora (
     CONSTRAINT PK_EmpresaEmisora PRIMARY KEY (cedula)
 );
 
-CREATE TABLE Cliente(
+CREATE TABLE CLIENTE(
     cedula VARCHAR(20)  NOT NULL,
     nombre VARCHAR(70) NOT NULL,
     direccion_contacto VARCHAR(50) NOT NULL,
@@ -23,8 +23,14 @@ CREATE TABLE Cliente(
     CONSTRAINT PK_Cliente PRIMARY KEY(cedula)
 );
 
+CREATE TABLE TIPODOCUMENTO(
+    id_tipo_documento   INT     NOT NULL,
+    descripcion_tipo_documento VARCHAR(50) NOT NULL,
 
-CREATE TABLE Divisa(
+    CONSTRAINT PK_TipoDocumento PRIMARY KEY (id_tipo_documento)
+);
+
+CREATE TABLE DIVISA(
     codigo_divisa CHAR(3) NOT NULL,
     nombre VARCHAR(50) NOT NULL,
     simbolo VARCHAR(5) NOT NULL,
@@ -32,14 +38,14 @@ CREATE TABLE Divisa(
     CONSTRAINT PK_Divisa PRIMARY KEY (codigo_divisa)
 );
 
-CREATE TABLE EstadoFactura (
+CREATE TABLE ESTADOFACTURA (
     estado VARCHAR(20) NOT NULL,
     descripcion_estado VARCHAR(100) NOT NULL,
 
     CONSTRAINT PK_EstadoFactura PRIMARY KEY (estado)
 );
 
-CREATE TABLE ProductoServicio(
+CREATE TABLE PRODUCTOSERVICIO(
     codigo_id VARCHAR(30) NOT NULL,
     descripcion VARCHAR(255) NOT NULL,
     precio_unitario DECIMAL(18,2) NOT NULL,
@@ -51,7 +57,7 @@ CREATE TABLE ProductoServicio(
     CONSTRAINT PK_ProductoServicio PRIMARY KEY (codigo_id)
 );
 
-CREATE TABLE Factura(
+CREATE TABLE FACTURA(
     codigo_factura INT IDENTITY(1,1) NOT NULL,
     identificador_comprobante VARCHAR(30) NOT NULL,
     cedula_empresa VARCHAR(20) NOT NULL,
@@ -70,14 +76,14 @@ CREATE TABLE Factura(
 
     CONSTRAINT PK_Factura PRIMARY KEY (codigo_factura),
     CONSTRAINT UQ_Factura_Comprobante UNIQUE (identificador_comprobante),
-    CONSTRAINT FK_Factura_EmpresaEm FOREIGN KEY (cedula_empresa) REFERENCES EmpresaEmisora(cedula),
-    CONSTRAINT FK_Factura_Cliente FOREIGN KEY (cedula_cliente) REFERENCES Cliente(cedula),
-    CONSTRAINT FK_Factura_TipoDoc FOREIGN KEY (id_tipo_documento) REFERENCES TipoDocumento(id_tipo_documento),
-    CONSTRAINT FK_Factura_Divisa FOREIGN KEY (codigo_divisa) REFERENCES Divisa(codigo_divisa),
-    CONSTRAINT FK_Factura_Estado FOREIGN KEY (estado_factura) REFERENCES EstadoFactura(estado)
+    CONSTRAINT FK_Factura_EmpresaEm FOREIGN KEY (cedula_empresa) REFERENCES EMPRESAEMISORA(cedula),
+    CONSTRAINT FK_Factura_Cliente FOREIGN KEY (cedula_cliente) REFERENCES CLIENTE(cedula),
+    CONSTRAINT FK_Factura_TipoDoc FOREIGN KEY (id_tipo_documento) REFERENCES TIPODOCUMENTO(id_tipo_documento),
+    CONSTRAINT FK_Factura_Divisa FOREIGN KEY (codigo_divisa) REFERENCES DIVISA(codigo_divisa),
+    CONSTRAINT FK_Factura_Estado FOREIGN KEY (estado_factura) REFERENCES ESTADOFACTURA(estado)
 );
 
-CREATE TABLE DetalleFactura (
+CREATE TABLE DETALLEFACTURA (
     id_detalle INT IDENTITY(1,1) NOT NULL,
     codigo_factura INT NOT NULL,
     codigo_producto VARCHAR(30) NOT NULL,
@@ -94,11 +100,11 @@ CREATE TABLE DetalleFactura (
     monto_total_linea AS (((cantidad * precio_unitario) - ((cantidad * precio_unitario) * (porcentaje_descuento / 100.0))) + (((cantidad * precio_unitario) - ((cantidad * precio_unitario) * (porcentaje_descuento / 100.0))) * (porcentaje_impuesto / 100.0))) PERSISTED,
 
     CONSTRAINT PK_DetalleFactura PRIMARY KEY (id_detalle),
-    CONSTRAINT FK_DetalleFactura_Factura FOREIGN KEY (codigo_factura) REFERENCES Factura(codigo_factura) ON DELETE CASCADE,
-    CONSTRAINT FK_DetalleFactura_Producto FOREIGN KEY (codigo_producto) REFERENCES ProductoServicio(codigo_id)
+    CONSTRAINT FK_DetalleFactura_Factura FOREIGN KEY (codigo_factura) REFERENCES FACTURA(codigo_factura) ON DELETE CASCADE,
+    CONSTRAINT FK_DetalleFactura_Producto FOREIGN KEY (codigo_producto) REFERENCES PRODUCTOSERVICIO(codigo_id)
 );
 
-CREATE TABLE AuditoriaSistema (
+CREATE TABLE AUDITORIASISTEMA (
     id_auditoria INT IDENTITY(1,1) NOT NULL,
     tabla_afectada VARCHAR(50) NOT NULL,          
     llave_primaria VARCHAR(50) NOT NULL,          
