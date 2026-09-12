@@ -1,0 +1,4 @@
+CREATE DABASE FacturacionSolucionesMagnificas;
+GO
+USE FacturacionSolucionesMagnificas;
+GO
