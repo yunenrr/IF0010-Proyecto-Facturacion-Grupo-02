@@ -118,10 +118,7 @@ CREATE TABLE DETALLEFACTURA (
         ) + (
             (
                 (CANTIDAD * PRECIO_UNITARIO)
-                - (
-                    (CANTIDAD * PRECIO_UNITARIO)
-                    * (PORCENTAJE_DESCUENTO / 100.0)
-                )
+                - ((CANTIDAD * PRECIO_UNITARIO) * (PORCENTAJE_DESCUENTO / 100.0))
             ) * (PORCENTAJE_IMPUESTO / 100.0)
         )
     ) PERSISTED,
