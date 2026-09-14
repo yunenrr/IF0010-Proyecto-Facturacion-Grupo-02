@@ -1,6 +1,5 @@
 [sqlfluff]
 dialect = tsql
-max_line_length = 120
 
 # Combinando tus reglas de identificadores, funciones, literales y seguridad de columnas
 select_rules = L010,capitalisation.identifiers,capitalisation.functions,capitalisation.literals,references.consistent,aliasing.unused,ambiguous.column_references
