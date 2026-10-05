@@ -1,0 +1,45 @@
+USE FACTURACIONSOLUCIONESMAGNIFICAS;
+GO
+
+IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_ActualizarCliente' AND type = 'P')
+BEGIN
+    DROP PROCEDURE dbo.pr_ActualizarCliente;
+END
+GO
+
+CREATE PROCEDURE dbo.pr_ActualizarCliente
+    @ID_CLIENTE INT,
+    @ID_DIRECCION INT,
+    @TELEFONO VARCHAR(15),
+    @CORREO VARCHAR(75)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF NOT EXISTS (SELECT 1 FROM dbo.CLIENTE WHERE ID_CLIENTE = @ID_CLIENTE)
+            THROW 50012, 'El cliente especificado no existe.', 1;
+
+        IF NOT EXISTS (SELECT 1 FROM dbo.DIRECCION WHERE ID_DIRECCION = @ID_DIRECCION)
+            THROW 50013, 'La direccion especificada no existe.', 1;
+
+        UPDATE dbo.CLIENTE
+        SET ID_DIRECCION = @ID_DIRECCION,
+            TELEFONO = @TELEFONO,
+            CORREO = @CORREO,
+            ULTIMA_ACTUALIZACION = SYSDATETIME()
+        WHERE ID_CLIENTE = @ID_CLIENTE;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF XACT_STATE() <> 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END
+GO
