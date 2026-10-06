@@ -32,8 +32,7 @@ BEGIN
             EXISTS (
                 SELECT 1
                 FROM DBO.CLIENTE
-                WHERE
-                    CEDULA_CLIENTE = @CEDULA_CLIENTE
+                WHERE CEDULA_CLIENTE = @CEDULA_CLIENTE
             )
             BEGIN
                 THROW 50014, 'Ya existe un cliente con esta cedula.', 1;
@@ -43,8 +42,7 @@ BEGIN
             NOT EXISTS (
                 SELECT 1
                 FROM DBO.DIRECCION
-                WHERE
-                    ID_DIRECCION = @ID_DIRECCION
+                WHERE ID_DIRECCION = @ID_DIRECCION
             )
             BEGIN
                 THROW 50015, 'La direccion especificada no existe.', 1;
@@ -81,6 +79,6 @@ BEGIN
             END;
 
         THROW;
-    END CATCH
+    END CATCH;
 END;
 GO
