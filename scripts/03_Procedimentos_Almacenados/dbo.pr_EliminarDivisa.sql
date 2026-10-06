@@ -31,9 +31,9 @@ BEGIN
                 WHERE CODIGO_DIVISA = @CODIGO_DIVISA
             )
             BEGIN
-                THROW 
-                50100, 
-                'La divisa especificada no existe.', 
+                THROW
+                50100,
+                'La divisa especificada no existe.',
                 1;
             END;
 
