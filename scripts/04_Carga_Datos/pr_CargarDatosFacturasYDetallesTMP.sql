@@ -13,7 +13,7 @@ IF
         DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
     END;
 GO
-
+    
 CREATE PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
     @TotalFacturas INT = 500000,
     @TamanoLote INT = 10000
@@ -75,14 +75,6 @@ BEGIN
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
                 ),
-            WITH NUMEROS AS (
-                SELECT TOP (@TamanoLote)
-                    ROW_NUMBER() OVER (
-                        ORDER BY (SELECT NULL)
-                    ) AS N
-                FROM SYS.ALL_OBJECTS AS A
-                CROSS JOIN SYS.ALL_OBJECTS AS B
-            ),
 
             DATOSCALCULADOS AS (
                 SELECT
