@@ -27,143 +27,143 @@ BEGIN
         CREATE TABLE #NOMBRES (NOMBRE VARCHAR(30));
         INSERT INTO #NOMBRES (NOMBRE)
         VALUES
-            ('Carlos'),
-            ('Ana'),
-            ('Luis'),
-            ('María'),
-            ('Juan'),
-            ('Sofía'),
-            ('Pedro'),
-            ('Lucía'),
-            ('Diego'),
-            ('Elena'),
-            ('Fernando'),
-            ('Valeria'),
-            ('José'),
-            ('Camila'),
-            ('Mateo'),
-            ('Paula'),
-            ('Gabriel'),
-            ('Daniela'),
-            ('Andrés'),
-            ('Natalia'),
-            ('Alejandro'),
-            ('Mariana'),
-            ('Esteban'),
-            ('Ximena'),
-            ('Sébastian'),
-            ('Jimena'),
-            ('Adrian'),
-            ('Fabiola'),
-            ('Ignacio'),
-            ('Sonia');
+        ('Carlos'),
+        ('Ana'),
+        ('Luis'),
+        ('María'),
+        ('Juan'),
+        ('Sofía'),
+        ('Pedro'),
+        ('Lucía'),
+        ('Diego'),
+        ('Elena'),
+        ('Fernando'),
+        ('Valeria'),
+        ('José'),
+        ('Camila'),
+        ('Mateo'),
+        ('Paula'),
+        ('Gabriel'),
+        ('Daniela'),
+        ('Andrés'),
+        ('Natalia'),
+        ('Alejandro'),
+        ('Mariana'),
+        ('Esteban'),
+        ('Ximena'),
+        ('Sébastian'),
+        ('Jimena'),
+        ('Adrian'),
+        ('Fabiola'),
+        ('Ignacio'),
+        ('Sonia');
 
         CREATE TABLE #APELLIDOS (APELLIDO VARCHAR(30));
         INSERT INTO #APELLIDOS (APELLIDO)
         VALUES
-            ('Rodríguez'),
-            ('Gómez'),
-            ('López'),
-            ('González'),
-            ('Martínez'),
-            ('Pérez'),
-            ('Sánchez'),
-            ('Ramírez'),
-            ('Torres'),
-            ('Flores'),
-            ('Vargas'),
-            ('Castro'),
-            ('Morales'),
-            ('Herrera'),
-            ('Jiménez'),
-            ('Reyes'),
-            ('Díaz'),
-            ('Mendoza'),
-            ('Aguilar'),
-            ('Rojas'),
-            ('Araya'),
-            ('Mora'),
-            ('Chaves'),
-            ('Solano'),
-            ('Campos'),
-            ('Monge'),
-            ('Cascante'),
-            ('Soto'),
-            ('Quesada'),
-            ('Gutiérrez');
+        ('Rodríguez'),
+        ('Gómez'),
+        ('López'),
+        ('González'),
+        ('Martínez'),
+        ('Pérez'),
+        ('Sánchez'),
+        ('Ramírez'),
+        ('Torres'),
+        ('Flores'),
+        ('Vargas'),
+        ('Castro'),
+        ('Morales'),
+        ('Herrera'),
+        ('Jiménez'),
+        ('Reyes'),
+        ('Díaz'),
+        ('Mendoza'),
+        ('Aguilar'),
+        ('Rojas'),
+        ('Araya'),
+        ('Mora'),
+        ('Chaves'),
+        ('Solano'),
+        ('Campos'),
+        ('Monge'),
+        ('Cascante'),
+        ('Soto'),
+        ('Quesada'),
+        ('Gutiérrez');
 
         CREATE TABLE #DOMINIOS (DOMINIO VARCHAR(20));
         INSERT INTO #DOMINIOS (DOMINIO)
         VALUES
-            ('gmail.com'),
-            ('outlook.com'),
-            ('hotmail.com'),
-            ('yahoo.es'),
-            ('icloud.com'),
-            ('empresa.cr');
+        ('gmail.com'),
+        ('outlook.com'),
+        ('hotmail.com'),
+        ('yahoo.es'),
+        ('icloud.com'),
+        ('empresa.cr');
 
         CREATE TABLE #CANTONES (CANTON VARCHAR(50));
         INSERT INTO #CANTONES (CANTON)
         VALUES
-            ('Central'),
-            ('Escazú'),
-            ('Desamparados'),
-            ('Puriscal'),
-            ('Tarrazú'),
-            ('Aserrí'),
-            ('Mora'),
-            ('Goicoechea'),
-            ('Santa Ana'),
-            ('Alajuelita'),
-            ('Vázquez de Coronado'),
-            ('Tibás'),
-            ('Moravia'),
-            ('Montes de Oca'),
-            ('Turrialba'),
-            ('San Ramón'),
-            ('Grecia'),
-            ('Atenas'),
-            ('Naranjo'),
-            ('Palmares'),
-            ('Poás'),
-            ('San Carlos'),
-            ('Pérez Zeledón');
+        ('Central'),
+        ('Escazú'),
+        ('Desamparados'),
+        ('Puriscal'),
+        ('Tarrazú'),
+        ('Aserrí'),
+        ('Mora'),
+        ('Goicoechea'),
+        ('Santa Ana'),
+        ('Alajuelita'),
+        ('Vázquez de Coronado'),
+        ('Tibás'),
+        ('Moravia'),
+        ('Montes de Oca'),
+        ('Turrialba'),
+        ('San Ramón'),
+        ('Grecia'),
+        ('Atenas'),
+        ('Naranjo'),
+        ('Palmares'),
+        ('Poás'),
+        ('San Carlos'),
+        ('Pérez Zeledón');
 
         CREATE TABLE #DISTRITOS (DISTRITO VARCHAR(50));
         INSERT INTO #DISTRITOS (DISTRITO)
         VALUES
-            ('Carmen'),
-            ('Merced'),
-            ('Hospital'),
-            ('Catedral'),
-            ('Zapote'),
-            ('San Francisco de Dos Ríos'),
-            ('Uruca'),
-            ('Mata Redonda'),
-            ('Pavas'),
-            ('Hatillo'),
-            ('San Sebastián'),
-            ('San Rafael'),
-            ('San Antonio'),
-            ('Guadalupe'),
-            ('San Pedro'),
-            ('Curridabat'),
-            ('San Juan'),
-            ('San Isidro'),
-            ('Quesada'),
-            ('San José');
+        ('Carmen'),
+        ('Merced'),
+        ('Hospital'),
+        ('Catedral'),
+        ('Zapote'),
+        ('San Francisco de Dos Ríos'),
+        ('Uruca'),
+        ('Mata Redonda'),
+        ('Pavas'),
+        ('Hatillo'),
+        ('San Sebastián'),
+        ('San Rafael'),
+        ('San Antonio'),
+        ('Guadalupe'),
+        ('San Pedro'),
+        ('Curridabat'),
+        ('San Juan'),
+        ('San Isidro'),
+        ('Quesada'),
+        ('San José');
 
         CREATE TABLE #SENAS (SENA VARCHAR(100));
         INSERT INTO #SENAS (SENA)
         VALUES
-            ('De la iglesia católica 200m Norte y 50m Este'),
-            ('Contiguo al Ebais, casa color blanco con rejas negras'),
-            ('Del parque central 100m Sur, frente al abastecedor'),
-            ('Condominio Los Azahares, casa #'),
-            ('Urbanización El Pilar, de la pulpería 75m Oeste'),
-            ('Residencial Altamira, 50m Este de la plaza de deportes'),
-            ('Calle principal, contiguo a la escuela primaria'),
-            ('150m Oeste del supermercado local, casa esquina');
+        ('De la iglesia católica 200m Norte y 50m Este'),
+        ('Contiguo al Ebais, casa color blanco con rejas negras'),
+        ('Del parque central 100m Sur, frente al abastecedor'),
+        ('Condominio Los Azahares, casa #'),
+        ('Urbanización El Pilar, de la pulpería 75m Oeste'),
+        ('Residencial Altamira, 50m Este de la plaza de deportes'),
+        ('Calle principal, contiguo a la escuela primaria'),
+        ('150m Oeste del supermercado local, casa esquina');
 
         DECLARE @BASECONTADOR INT;
         SELECT @BASECONTADOR = ISNULL(MAX(ID_CLIENTE), 0)
@@ -197,141 +197,141 @@ BEGIN
         );
 
         WHILE @I <= @CANTIDAD
-        BEGIN
-            SET @CODIGOPROVINCIA = ((@I - 1) % 7) + 1;
-            SET @PROVINCIA = CASE @CODIGOPROVINCIA
-                WHEN 1 THEN 'San José'
-                WHEN 2 THEN 'Alajuela'
-                WHEN 3 THEN 'Cartago'
-                WHEN 4 THEN 'Heredia'
-                WHEN 5 THEN 'Guanacaste'
-                WHEN 6 THEN 'Puntarenas'
-                ELSE 'Limón'
-            END;
-
-            SELECT TOP 1 @CANTONTEMP = CANTON
-            FROM #CANTONES
-            ORDER BY NEWID();
-
-            SELECT TOP 1 @DISTRITOTEMP = DISTRITO
-            FROM #DISTRITOS
-            ORDER BY NEWID();
-
-            SELECT TOP 1 @SENATEMP = SENA
-            FROM #SENAS
-            ORDER BY NEWID();
-
-            IF @SENATEMP LIKE '%#'
-                BEGIN
-                    SET
-                        @SENATEMP = CONCAT(
-                            LEFT(@SENATEMP, LEN(@SENATEMP) - 1),
-                            (@I % 150) + 1
-                        );
+            BEGIN
+                SET @CODIGOPROVINCIA = ((@I - 1) % 7) + 1;
+                SET @PROVINCIA = CASE @CODIGOPROVINCIA
+                    WHEN 1 THEN 'San José'
+                    WHEN 2 THEN 'Alajuela'
+                    WHEN 3 THEN 'Cartago'
+                    WHEN 4 THEN 'Heredia'
+                    WHEN 5 THEN 'Guanacaste'
+                    WHEN 6 THEN 'Puntarenas'
+                    ELSE 'Limón'
                 END;
 
-            INSERT INTO DBO.DIRECCION (
-                PROVINCIA,
-                CANTON,
-                DISTRITO,
-                SENAS_ADICIONALES
-            )
-            VALUES (
-                @PROVINCIA,
-                ISNULL(@CANTONTEMP, 'Central'),
-                ISNULL(@DISTRITOTEMP, 'San José'),
-                ISNULL(@SENATEMP, 'Sin señas adicionales')
-            );
+                SELECT TOP 1 @CANTONTEMP = CANTON
+                FROM #CANTONES
+                ORDER BY NEWID();
 
-            IF @@ROWCOUNT = 0
-                BEGIN
-                    THROW
-                    50014,
-                    'No se pudo registrar la dirección para el cliente.',
-                    1;
-                END;
+                SELECT TOP 1 @DISTRITOTEMP = DISTRITO
+                FROM #DISTRITOS
+                ORDER BY NEWID();
 
-            SET @NUEVOIDDIRECCION = SCOPE_IDENTITY();
+                SELECT TOP 1 @SENATEMP = SENA
+                FROM #SENAS
+                ORDER BY NEWID();
 
-            SELECT TOP 1 @NOMTEMP = NOMBRE
-            FROM #NOMBRES
-            ORDER BY NEWID();
+                IF @SENATEMP LIKE '%#'
+                    BEGIN
+                        SET
+                            @SENATEMP = CONCAT(
+                                LEFT(@SENATEMP, LEN(@SENATEMP) - 1),
+                                (@I % 150) + 1
+                            );
+                    END;
 
-            SELECT TOP 1 @APE1TEMP = APELLIDO
-            FROM #APELLIDOS
-            ORDER BY NEWID();
-
-            SELECT TOP 1 @APE2TEMP = APELLIDO
-            FROM #APELLIDOS
-            ORDER BY NEWID();
-
-            SELECT TOP 1 @DOMTEMP = DOMINIO
-            FROM #DOMINIOS
-            ORDER BY NEWID();
-
-            SET
-                @NOMBREALEATORIO = CONCAT(
-                    @NOMTEMP,
-                    ' ',
-                    @APE1TEMP,
-                    ' ',
-                    @APE2TEMP
+                INSERT INTO DBO.DIRECCION (
+                    PROVINCIA,
+                    CANTON,
+                    DISTRITO,
+                    SENAS_ADICIONALES
+                )
+                VALUES (
+                    @PROVINCIA,
+                    ISNULL(@CANTONTEMP, 'Central'),
+                    ISNULL(@DISTRITOTEMP, 'San José'),
+                    ISNULL(@SENATEMP, 'Sin señas adicionales')
                 );
-            SET @CEDULAPROVINCIAL = CONCAT(
-                CAST(@CODIGOPROVINCIA AS VARCHAR(1)),
-                RIGHT(CONCAT('00000000', @BASECONTADOR + @I), 8)
-            );
-            SET
-                @CORREOALEATORIO = LOWER(
-                    CONCAT(
+
+                IF @@ROWCOUNT = 0
+                    BEGIN
+                        THROW
+                        50014,
+                        'No se pudo registrar la dirección para el cliente.',
+                        1;
+                    END;
+
+                SET @NUEVOIDDIRECCION = SCOPE_IDENTITY();
+
+                SELECT TOP 1 @NOMTEMP = NOMBRE
+                FROM #NOMBRES
+                ORDER BY NEWID();
+
+                SELECT TOP 1 @APE1TEMP = APELLIDO
+                FROM #APELLIDOS
+                ORDER BY NEWID();
+
+                SELECT TOP 1 @APE2TEMP = APELLIDO
+                FROM #APELLIDOS
+                ORDER BY NEWID();
+
+                SELECT TOP 1 @DOMTEMP = DOMINIO
+                FROM #DOMINIOS
+                ORDER BY NEWID();
+
+                SET
+                    @NOMBREALEATORIO = CONCAT(
                         @NOMTEMP,
-                        '.',
+                        ' ',
                         @APE1TEMP,
-                        @BASECONTADOR + @I,
-                        '@',
-                        @DOMTEMP
-                    )
+                        ' ',
+                        @APE2TEMP
+                    );
+                SET @CEDULAPROVINCIAL = CONCAT(
+                    CAST(@CODIGOPROVINCIA AS VARCHAR(1)),
+                    RIGHT(CONCAT('00000000', @BASECONTADOR + @I), 8)
+                );
+                SET
+                    @CORREOALEATORIO = LOWER(
+                        CONCAT(
+                            @NOMTEMP,
+                            '.',
+                            @APE1TEMP,
+                            @BASECONTADOR + @I,
+                            '@',
+                            @DOMTEMP
+                        )
+                    );
+
+                SET @NUEVOIDCLIENTE = @BASECONTADOR + @I;
+
+                INSERT INTO DBO.CLIENTE (
+                    ID_CLIENTE,
+                    CEDULA_CLIENTE,
+                    NOMBRE,
+                    ID_DIRECCION,
+                    TELEFONO,
+                    CORREO
+                )
+                OUTPUT
+                    INSERTED.ID_CLIENTE,
+                    INSERTED.CEDULA_CLIENTE,
+                    INSERTED.NOMBRE,
+                    INSERTED.ID_DIRECCION,
+                    INSERTED.TELEFONO,
+                    INSERTED.CORREO,
+                    INSERTED.FECHA_REGISTRO
+                INTO #CLIENTESINSERTADOS
+                VALUES (
+                    @NUEVOIDCLIENTE,
+                    @CEDULAPROVINCIAL,
+                    @NOMBREALEATORIO,
+                    @NUEVOIDDIRECCION,
+                    CONCAT(
+                        CASE WHEN @I % 2 = 0 THEN '8' ELSE '7' END,
+                        RIGHT(CONCAT('0000000', @I), 7)
+                    ),
+                    @CORREOALEATORIO
                 );
 
-            SET @NUEVOIDCLIENTE = @BASECONTADOR + @I;
+                IF @@ROWCOUNT = 0
+                    BEGIN
+                        THROW 50015, 'No se pudo registrar el cliente.', 1;
+                    END;
 
-            INSERT INTO DBO.CLIENTE (
-                ID_CLIENTE,
-                CEDULA_CLIENTE,
-                NOMBRE,
-                ID_DIRECCION,
-                TELEFONO,
-                CORREO
-            )
-            OUTPUT
-                INSERTED.ID_CLIENTE,
-                INSERTED.CEDULA_CLIENTE,
-                INSERTED.NOMBRE,
-                INSERTED.ID_DIRECCION,
-                INSERTED.TELEFONO,
-                INSERTED.CORREO,
-                INSERTED.FECHA_REGISTRO
-            INTO #CLIENTESINSERTADOS
-            VALUES (
-                @NUEVOIDCLIENTE,
-                @CEDULAPROVINCIAL,
-                @NOMBREALEATORIO,
-                @NUEVOIDDIRECCION,
-                CONCAT(
-                    CASE WHEN @I % 2 = 0 THEN '8' ELSE '7' END,
-                    RIGHT(CONCAT('0000000', @I), 7)
-                ),
-                @CORREOALEATORIO
-            );
-
-            IF @@ROWCOUNT = 0
-                BEGIN
-                    THROW 50015, 'No se pudo registrar el cliente.', 1;
-                END;
-
-            SET @FILASINSERTADAS = @FILASINSERTADAS + 1;
-            SET @I = @I + 1;
-        END;
+                SET @FILASINSERTADAS = @FILASINSERTADAS + 1;
+                SET @I = @I + 1;
+            END;
 
         IF @FILASINSERTADAS = 0
             BEGIN
