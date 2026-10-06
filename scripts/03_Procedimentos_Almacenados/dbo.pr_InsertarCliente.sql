@@ -1,13 +1,20 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_InsertarCliente' AND type = 'P')
-BEGIN
-    DROP PROCEDURE dbo.pr_InsertarCliente;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_INSERTARCLIENTE'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_INSERTARCLIENTE;
+    END;
 GO
 
-CREATE PROCEDURE dbo.pr_InsertarCliente
+CREATE PROCEDURE DBO.PR_INSERTARCLIENTE
     @CEDULA VARCHAR(20),
     @NOMBRE VARCHAR(70),
     @ID_DIRECCION INT,
@@ -21,26 +28,50 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF EXISTS (SELECT 1 FROM dbo.CLIENTE WHERE CEDULA = @CEDULA)
-            THROW 50003, 'Ya existe un cliente con esta cedula.', 1;
+        IF
+            EXISTS (
+                SELECT 1
+                FROM DBO.CLIENTE
+                WHERE CEDULA = @CEDULA
+            )
+            BEGIN
+                THROW 50003, 'Ya existe un cliente con esta cedula.', 1;
+            END;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.DIRECCION WHERE ID_DIRECCION = @ID_DIRECCION)
-            THROW 50001, 'La direccion especificada no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.DIRECCION
+                WHERE ID_DIRECCION = @ID_DIRECCION
+            )
+            BEGIN
+                THROW 50001, 'La direccion especificada no existe.', 1;
+            END;
 
-        INSERT INTO dbo.CLIENTE (
-            CEDULA, NOMBRE, ID_DIRECCION, TELEFONO, CORREO
+        INSERT INTO DBO.CLIENTE (
+            CEDULA,
+            NOMBRE,
+            ID_DIRECCION,
+            TELEFONO,
+            CORREO
         )
         VALUES (
-            @CEDULA, @NOMBRE, @ID_DIRECCION, @TELEFONO, @CORREO
+            @CEDULA,
+            @NOMBRE,
+            @ID_DIRECCION,
+            @TELEFONO,
+            @CORREO
         );
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO
