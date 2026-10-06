@@ -1,20 +1,14 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF
-    EXISTS (
-        SELECT 1 FROM SYS.OBJECTS
-        WHERE NAME = 'pr_ActualizarDivisa' AND TYPE = 'P'
-    )
-    BEGIN
-        DROP PROCEDURE DBO.PR_ACTUALIZARDIVISA;
-    END
+IF OBJECT_ID('DBO.PR_ACTUALIZARDIVISA', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_ACTUALIZARDIVISA;
 GO
 
 CREATE PROCEDURE DBO.PR_ACTUALIZARDIVISA
-    @CodigoDivisa CHAR(3),
-    @Nombre VARCHAR(50),
-    @Simbolo VARCHAR(5)
+    @CODIGODIVISA CHAR(3),
+    @NOMBRE VARCHAR(50),
+    @SIMBOLO VARCHAR(5)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -23,39 +17,47 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        SET @CodigoDivisa = UPPER(TRIM(@CodigoDivisa));
-        SET @Nombre = TRIM(@Nombre);
-        SET @Simbolo = TRIM(@Simbolo);
+        SET @CODIGODIVISA = UPPER(TRIM(@CODIGODIVISA));
+        SET @NOMBRE = TRIM(@NOMBRE);
+        SET @SIMBOLO = TRIM(@SIMBOLO);
 
         IF
             NOT EXISTS (
-                SELECT 1 FROM DBO.DIVISA
-                WHERE CODIGO_DIVISA = @CodigoDivisa
+                SELECT 1
+                FROM DBO.DIVISA
+                WHERE CODIGO_DIVISA = @CODIGODIVISA
             )
-            THROW 50090,
+            BEGIN
+                THROW
+                50090,
                 'La divisa especificada no existe en la base de datos.',
                 1;
+            END;
 
-        IF @Nombre IS NULL OR @Nombre = ''
-            THROW 50091,
-                'El nombre de la divisa no puede estar vacío.',
-                1;
+        IF @NOMBRE IS NULL OR @NOMBRE = ''
+            BEGIN
+                THROW 50091, 'El nombre de la divisa no puede estar vacío.', 1;
+            END;
 
-        IF @Simbolo IS NULL OR @Simbolo = ''
-            THROW 50092,
-                'El símbolo de la divisa no puede estar vacío.',
-                1;
+        IF @SIMBOLO IS NULL OR @SIMBOLO = ''
+            BEGIN
+                THROW 50092, 'El símbolo de la divisa no puede estar vacío.', 1;
+            END;
 
         UPDATE DBO.DIVISA
         SET
-            NOMBRE = @Nombre,
-            SIMBOLO = @Simbolo
-        WHERE CODIGO_DIVISA = @CodigoDivisa;
+            NOMBRE = @NOMBRE,
+            SIMBOLO = @SIMBOLO
+        WHERE
+            CODIGO_DIVISA = @CODIGODIVISA;
 
         IF @@ROWCOUNT = 0
-            THROW 50093,
+            BEGIN
+                THROW
+                50093,
                 'No se realizó ninguna actualización en la divisa.',
                 1;
+            END;
 
         COMMIT TRANSACTION;
 
@@ -64,13 +66,15 @@ BEGIN
             NOMBRE,
             SIMBOLO
         FROM DBO.DIVISA
-        WHERE CODIGO_DIVISA = @CodigoDivisa;
+        WHERE CODIGO_DIVISA = @CODIGODIVISA;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
     END CATCH
-END
+END;
 GO
