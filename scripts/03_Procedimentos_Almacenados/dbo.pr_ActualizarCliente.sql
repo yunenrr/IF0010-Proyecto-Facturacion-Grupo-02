@@ -1,13 +1,14 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (
-    SELECT 1
-    FROM SYS.OBJECTS
-    WHERE
-        NAME = 'PR_ACTUALIZARCLIENTE'
-        AND TYPE = 'P'
-)
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ACTUALIZARCLIENTE'
+            AND TYPE = 'P'
+    )
 BEGIN
     DROP PROCEDURE DBO.PR_ACTUALIZARCLIENTE;
 END;
@@ -26,20 +27,22 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (
-            SELECT 1
-            FROM DBO.CLIENTE
-            WHERE ID_CLIENTE = @ID_CLIENTE
-        )
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.CLIENTE
+                WHERE ID_CLIENTE = @ID_CLIENTE
+            )
         BEGIN
             THROW 50016, 'El cliente especificado no existe.', 1;
         END;
 
-        IF NOT EXISTS (
-            SELECT 1
-            FROM DBO.DIRECCION
-            WHERE ID_DIRECCION = @ID_DIRECCION
-        )
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.DIRECCION
+                WHERE ID_DIRECCION = @ID_DIRECCION
+            )
         BEGIN
             THROW 50017, 'La direccion especificada no existe.', 1;
         END;
