@@ -1,13 +1,20 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_ActualizarFactura' AND type = 'P')
-BEGIN
-    DROP PROCEDURE dbo.pr_ActualizarFactura;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ACTUALIZARFACTURA'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ACTUALIZARFACTURA;
+    END;
 GO
 
-CREATE PROCEDURE dbo.pr_ActualizarFactura
+CREATE PROCEDURE DBO.PR_ACTUALIZARFACTURA
     @CODIGO_FACTURA INT,
     @ID_ESTADO INT,
     @OBSERVACIONES VARCHAR(255)
@@ -19,25 +26,43 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.FACTURA WHERE CODIGO_FACTURA = @CODIGO_FACTURA)
-            THROW 50051, 'La factura especificada no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.FACTURA
+                WHERE CODIGO_FACTURA = @CODIGO_FACTURA
+            )
+            BEGIN
+                THROW 50051, 'La factura especificada no existe.', 1;
+            END;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.ESTADOFACTURA WHERE ID_ESTADO = @ID_ESTADO)
-            THROW 50052, 'El estado especificado no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.ESTADOFACTURA
+                WHERE ID_ESTADO = @ID_ESTADO
+            )
+            BEGIN
+                THROW 50052, 'El estado especificado no existe.', 1;
+            END;
 
-        UPDATE dbo.FACTURA
-        SET ID_ESTADO = @ID_ESTADO,
+        UPDATE DBO.FACTURA
+        SET
+            ID_ESTADO = @ID_ESTADO,
             OBSERVACIONES = @OBSERVACIONES,
             UPDATED_AT = SYSDATETIME()
-        WHERE CODIGO_FACTURA = @CODIGO_FACTURA;
+        WHERE
+            CODIGO_FACTURA = @CODIGO_FACTURA;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO
