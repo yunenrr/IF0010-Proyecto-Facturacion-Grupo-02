@@ -1,16 +1,16 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('dbo.pr_RegistrarDireccion', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_RegistrarDireccion;
+IF OBJECT_ID('DBO.PR_REGISTRARDIRECCION', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_REGISTRARDIRECCION;
 GO
 
-CREATE PROCEDURE dbo.pr_RegistrarDireccion
-    @Provincia VARCHAR(50),
-    @Canton VARCHAR(50),
-    @Distrito VARCHAR(50),
-    @SenasAdicionales VARCHAR(250),
-    @IdDireccion INT OUTPUT
+CREATE PROCEDURE DBO.PR_REGISTRARDIRECCION
+    @PROVINCIA VARCHAR(50),
+    @CANTON VARCHAR(50),
+    @DISTRITO VARCHAR(50),
+    @SENASADICIONALES VARCHAR(250),
+    @IDDIRECCION INT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -18,27 +18,30 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        INSERT INTO dbo.DIRECCION (
+        INSERT INTO DBO.DIRECCION (
             PROVINCIA,
             CANTON,
             DISTRITO,
             SENAS_ADICIONALES
         )
         VALUES (
-            @Provincia,
-            @Canton,
-            @Distrito,
-            @SenasAdicionales
+            @PROVINCIA,
+            @CANTON,
+            @DISTRITO,
+            @SENASADICIONALES
         );
 
-        SET @IdDireccion = SCOPE_IDENTITY();
+        SET @IDDIRECCION = SCOPE_IDENTITY();
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
+
         THROW;
-    END CATCH
+    END CATCH;
 END;
-GO  
+GO
