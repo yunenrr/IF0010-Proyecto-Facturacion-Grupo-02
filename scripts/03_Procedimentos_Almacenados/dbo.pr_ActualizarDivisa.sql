@@ -32,13 +32,19 @@ BEGIN
                 SELECT 1 FROM DBO.DIVISA
                 WHERE CODIGO_DIVISA = @CodigoDivisa
             )
-            THROW 50090, 'La divisa especificada no existe en la base de datos.', 1;
+            THROW 50090,
+                'La divisa especificada no existe en la base de datos.',
+                1;
 
         IF @Nombre IS NULL OR @Nombre = ''
-            THROW 50091, 'El nombre de la divisa no puede estar vacío.', 1;
+            THROW 50091,
+                'El nombre de la divisa no puede estar vacío.',
+                1;
 
         IF @Simbolo IS NULL OR @Simbolo = ''
-            THROW 50092, 'El símbolo de la divisa no puede estar vacío.', 1;
+            THROW 50092,
+                'El símbolo de la divisa no puede estar vacío.',
+                1;
 
         UPDATE DBO.DIVISA
         SET
@@ -47,7 +53,9 @@ BEGIN
         WHERE CODIGO_DIVISA = @CodigoDivisa;
 
         IF @@ROWCOUNT = 0
-            THROW 50093, 'No se realizó ninguna actualización en la divisa.', 1;
+            THROW 50093,
+                'No se realizó ninguna actualización en la divisa.',
+                1;
 
         COMMIT TRANSACTION;
 
