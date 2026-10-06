@@ -26,7 +26,7 @@ BEGIN
             BEGIN
                 THROW
                 50070,
-                'La operación especificada no es válida. Debe ser INSERT, UPDATE o DELETE.',
+                'La operación especificada no es válida',
                 1;
             END;
 
