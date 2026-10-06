@@ -1,13 +1,20 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_EliminarCliente' AND type = 'P')
-BEGIN
-    DROP PROCEDURE dbo.pr_EliminarCliente;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ELIMINARCLIENTE'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ELIMINARCLIENTE;
+    END;
 GO
 
-CREATE PROCEDURE dbo.pr_EliminarCliente
+CREATE PROCEDURE DBO.PR_ELIMINARCLIENTE
     @ID_CLIENTE INT
 AS
 BEGIN
@@ -17,22 +24,42 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.CLIENTE WHERE ID_CLIENTE = @ID_CLIENTE)
-            THROW 50018, 'El cliente especificado no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.CLIENTE
+                WHERE ID_CLIENTE = @ID_CLIENTE
+            )
+            BEGIN
+                THROW 50018, 'El cliente especificado no existe.', 1;
+            END;
 
-        IF EXISTS (SELECT 1 FROM dbo.FACTURA WHERE ID_CLIENTE = @ID_CLIENTE)
-            THROW 50019, 'No se puede eliminar: el cliente tiene facturas asociadas.', 1;
+        IF
+            EXISTS (
+                SELECT 1
+                FROM DBO.FACTURA
+                WHERE ID_CLIENTE = @ID_CLIENTE
+            )
+            BEGIN
+                THROW
+                50019,
+                'No se puede eliminar: el cliente tiene facturas asociadas.',
+                1;
+            END;
 
-        DELETE FROM dbo.CLIENTE
-        WHERE ID_CLIENTE = @ID_CLIENTE;
+        DELETE FROM DBO.CLIENTE
+        WHERE
+            ID_CLIENTE = @ID_CLIENTE;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO
