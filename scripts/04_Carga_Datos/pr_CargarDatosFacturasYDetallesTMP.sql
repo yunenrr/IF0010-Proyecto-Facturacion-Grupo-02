@@ -1,4 +1,5 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
+
 GO
 
 IF OBJECT_ID('DBO.PR_CARGARDATOSFACTURASYDETALLESTMP', 'P') IS NOT NULL
@@ -21,8 +22,7 @@ BEGIN
     FROM DBO.FACTURA AS F;
 
     -- Tablas temporales de apoyo
-    CREATE TABLE #LoteFacturas
-    (
+    CREATE TABLE #LoteFacturas (
         CODIGO_FACTURA INT PRIMARY KEY,
         IDENTIFICADOR_COMPROBANTE VARCHAR(100),
         ID_EMPRESA INT,
@@ -36,8 +36,7 @@ BEGIN
         MONTO_TOTAL DECIMAL(18, 2) DEFAULT 0
     );
 
-    CREATE TABLE #LoteDetalles
-    (
+    CREATE TABLE #LoteDetalles (
         CODIGO_FACTURA INT,
         NUMERO_LINEA INT,
         CODIGO_PRODUCTO INT,
@@ -58,18 +57,15 @@ BEGIN
             TRUNCATE TABLE #LoteFacturas;
             TRUNCATE TABLE #LoteDetalles;
 
-            WITH NUMEROS AS
-            (
+            WITH NUMEROS AS (
                 SELECT TOP (@TamanoLote)
                     ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
             ),
-            DATOSCALCULADOS AS
-            (
+            DATOSCALCULADOS AS (
                 SELECT
-                    (@MaxCodigoActual + @FacturasProcesadas + N)
-                        AS CODIGO_FACTURA,
+                    (@MaxCodigoActual + @FacturasProcesadas + N) AS CODIGO_FACTURA,
                     ((N * 17) % 100) + 1 AS ID_EMPRESA,
                     ((N * 31) % 50000) + 1 AS ID_CLIENTE,
                     ((N % 4) + 1) AS ID_TIPO_DOCUMENTO,
@@ -85,8 +81,8 @@ BEGIN
                     ) AS FECHA_EMISION
                 FROM NUMEROS
             )
-            INSERT INTO #LoteFacturas
-            (
+
+            INSERT INTO #LoteFacturas (
                 CODIGO_FACTURA,
                 ID_EMPRESA,
                 ID_CLIENTE,
@@ -125,8 +121,7 @@ BEGIN
             INNER JOIN DBO.TIPODOCUMENTO AS TD
                 ON D.ID_TIPO_DOCUMENTO = TD.ID_TIPO_DOCUMENTO;
 
-            INSERT INTO #LoteDetalles
-            (
+            INSERT INTO #LoteDetalles (
                 CODIGO_FACTURA,
                 NUMERO_LINEA,
                 CODIGO_PRODUCTO,
@@ -165,8 +160,7 @@ BEGIN
                     AS DECIMAL(18, 2)
                 ) AS MONTO_TOTAL_LINEA
             FROM #LoteFacturas AS F
-            CROSS APPLY
-            (
+            CROSS APPLY (
                 SELECT
                     GS.N AS NUMEROLINEA,
                     (
@@ -178,7 +172,7 @@ BEGIN
                 FROM
                 (
                     SELECT 
-                    1 AS N
+                        1 AS N
                     UNION ALL
                     SELECT 2
                     UNION ALL
@@ -200,8 +194,7 @@ BEGIN
                 F.TOTAL_IMPUESTOS = T.IMPUESTOSUM,
                 F.MONTO_TOTAL = T.TOTALSUM
             FROM #LoteFacturas AS F
-            INNER JOIN
-            (
+            INNER JOIN (
                SELECT
                     CODIGO_FACTURA,
                     SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
@@ -212,8 +205,7 @@ BEGIN
             ) AS T
                 ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
-            INSERT INTO DBO.FACTURA
-            (
+            INSERT INTO DBO.FACTURA (
                 CODIGO_FACTURA,
                 IDENTIFICADOR_COMPROBANTE,
                 ID_EMPRESA,
@@ -240,8 +232,7 @@ BEGIN
                 MONTO_TOTAL
             FROM #LoteFacturas;
 
-            INSERT INTO DBO.DETALLEFACTURA
-            (
+            INSERT INTO DBO.DETALLEFACTURA (
                 CODIGO_FACTURA,
                 NUMERO_LINEA,
                 CODIGO_PRODUCTO,
@@ -268,8 +259,8 @@ BEGIN
 
             COMMIT TRANSACTION;
 
-            SET @FacturasProcesadas =
-                @FacturasProcesadas + @TamanoLote;
+            SET @FacturasProcesadas 
+                = @FacturasProcesadas + @TamanoLote;
         END TRY
         BEGIN CATCH
             IF XACT_STATE() <> 0
@@ -297,10 +288,7 @@ EXEC DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
 PRINT 'Carga masiva completada con éxito.';
 GO
 
-IF OBJECT_ID(
-    'DBO.PR_CARGARDATOSFACTURASYDETALLESTMP',
-    'P'
-) IS NOT NULL
+IF OBJECT_ID('DBO.PR_CARGARDATOSFACTURASYDETALLESTMP', 'P') IS NOT NULL
     DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
 GO
 
