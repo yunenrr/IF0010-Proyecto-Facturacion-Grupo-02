@@ -52,34 +52,33 @@ BEGIN
     );
 
     WHILE @FacturasProcesadas < @TotalFacturas
-        BEGIN
-            BEGIN TRY
-                BEGIN TRANSACTION;
-
-                TRUNCATE TABLE #LoteFacturas;
-                TRUNCATE TABLE #LoteDetalles;
-
-                WITH NUMEROS AS (
-                    SELECT TOP (@TamanoLote)
-                        ROW_NUMBER() OVER (
-                                ORDER BY (SELECT NULL)
-                    ) AS N
+    BEGIN
+        BEGIN TRY
+            BEGIN TRANSACTION;
 
             TRUNCATE TABLE #Numeros;
             TRUNCATE TABLE #LoteFacturas;
             TRUNCATE TABLE #LoteDetalles;
 
             ;WITH SECUENCIA AS (
-                SELECT TOP (@TamanoLote) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
+                SELECT TOP (@TamanoLote)
+                    ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
             )
             INSERT INTO #Numeros (N)
-            SELECT N FROM SECUENCIA;
+            SELECT N
+            FROM SECUENCIA;
 
             INSERT INTO #LoteFacturas (
-                CODIGO_FACTURA, ID_EMPRESA, ID_CLIENTE, ID_TIPO_DOCUMENTO,
-                CODIGO_DIVISA, ID_ESTADO, IDENTIFICADOR_COMPROBANTE, FECHA_EMISION
+                CODIGO_FACTURA,
+                ID_EMPRESA,
+                ID_CLIENTE,
+                ID_TIPO_DOCUMENTO,
+                CODIGO_DIVISA,
+                ID_ESTADO,
+                IDENTIFICADOR_COMPROBANTE,
+                FECHA_EMISION
             )
             SELECT
                 @MaxCodigoActual + @FacturasProcesadas + N.N,
@@ -89,16 +88,35 @@ BEGIN
                 CASE WHEN (N.N % 2) = 0 THEN 'CRC' ELSE 'USD' END,
                 ((N.N % 4) + 1),
                 CONCAT(
-                    FORMAT(DATEADD(SECOND, (N.N + @FacturasProcesadas) * 60, @FechaInicio), 'yyyyMMddHHmmss'),
-                    '-', ((N.N % 4) + 1)
+                    FORMAT(
+                        DATEADD(
+                            SECOND,
+                            (N.N + @FacturasProcesadas) * 60,
+                            @FechaInicio
+                        ),
+                        'yyyyMMddHHmmss'
+                    ),
+                    '-',
+                    ((N.N % 4) + 1)
                 ),
-                DATEADD(SECOND, (N.N + @FacturasProcesadas) * 60, @FechaInicio)
+                DATEADD(
+                    SECOND,
+                    (N.N + @FacturasProcesadas) * 60,
+                    @FechaInicio
+                )
             FROM #Numeros AS N;
 
             INSERT INTO #LoteDetalles (
-                CODIGO_FACTURA, NUMERO_LINEA, CODIGO_PRODUCTO, DESCRIPCION,
-                CANTIDAD, PRECIO_UNITARIO, PORCENTAJE_IMPUESTO,
-                SUBTOTAL_LINEA, MONTO_IMPUESTO, MONTO_TOTAL_LINEA
+                CODIGO_FACTURA,
+                NUMERO_LINEA,
+                CODIGO_PRODUCTO,
+                DESCRIPCION,
+                CANTIDAD,
+                PRECIO_UNITARIO,
+                PORCENTAJE_IMPUESTO,
+                SUBTOTAL_LINEA,
+                MONTO_IMPUESTO,
+                MONTO_TOTAL_LINEA
             )
             SELECT
                 F.CODIGO_FACTURA,
@@ -108,22 +126,43 @@ BEGIN
                 L.CANT,
                 P.PRECIO_UNITARIO,
                 P.PORCENTAJE_IMPUESTO,
-                CAST(L.CANT * P.PRECIO_UNITARIO AS DECIMAL(18, 2)),
-                CAST(L.CANT * P.PRECIO_UNITARIO * P.PORCENTAJE_IMPUESTO / 100.00 AS DECIMAL(18, 2)),
-                CAST(L.CANT * P.PRECIO_UNITARIO * (1 + P.PORCENTAJE_IMPUESTO / 100.00) AS DECIMAL(18, 2))
+                CAST(
+                    L.CANT * P.PRECIO_UNITARIO AS DECIMAL(18, 2)
+                ),
+                CAST(
+                    L.CANT * P.PRECIO_UNITARIO
+                    * P.PORCENTAJE_IMPUESTO / 100.00
+                    AS DECIMAL(18, 2)
+                ),
+                CAST(
+                    L.CANT * P.PRECIO_UNITARIO
+                    * (1 + P.PORCENTAJE_IMPUESTO / 100.00)
+                    AS DECIMAL(18, 2)
+                )
             FROM #LoteFacturas AS F
             CROSS JOIN (VALUES (1), (2), (3), (4), (5)) AS X(NUMLINEA)
             CROSS APPLY (
                 SELECT
                     X.NUMLINEA AS NUMLINEA,
-                    ((F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000) + 1 AS CODIGOPROD,
-                    ((F.CODIGO_FACTURA * 3 + X.NUMLINEA) % 5) + 1 AS CANT
+                    (
+                        (F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000
+                    ) + 1 AS CODIGOPROD,
+                    (
+                        (F.CODIGO_FACTURA * 3 + X.NUMLINEA) % 5
+                    ) + 1 AS CANT
             ) AS L
-            INNER JOIN DBO.PRODUCTO AS P ON L.CODIGOPROD = P.CODIGO_ID
+            INNER JOIN DBO.PRODUCTO AS P
+                ON L.CODIGOPROD = P.CODIGO_ID
             WHERE
                 X.NUMLINEA <= 3
-                OR (X.NUMLINEA = 4 AND (F.CODIGO_FACTURA % 2) = 0)
-                OR (X.NUMLINEA = 5 AND (F.CODIGO_FACTURA % 3) = 0);
+                OR (
+                    X.NUMLINEA = 4
+                    AND (F.CODIGO_FACTURA % 2) = 0
+                )
+                OR (
+                    X.NUMLINEA = 5
+                    AND (F.CODIGO_FACTURA % 3) = 0
+                );
 
             UPDATE F
             SET
@@ -132,37 +171,72 @@ BEGIN
                 F.MONTO_TOTAL = T.TOTALSUM
             FROM #LoteFacturas AS F
             INNER JOIN (
-                SELECT CODIGO_FACTURA, SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
-                    SUM(MONTO_IMPUESTO) AS IMPUESTOSUM, SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
+                SELECT
+                    CODIGO_FACTURA,
+                    SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
+                    SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
+                    SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
                 FROM #LoteDetalles
                 GROUP BY CODIGO_FACTURA
-            ) AS T ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
+            ) AS T
+                ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
             INSERT INTO DBO.FACTURA (
-                CODIGO_FACTURA, IDENTIFICADOR_COMPROBANTE, ID_EMPRESA, ID_CLIENTE,
-                ID_TIPO_DOCUMENTO, CODIGO_DIVISA, ID_ESTADO, FECHA_EMISION,
-                SUBTOTAL, TOTAL_IMPUESTOS, MONTO_TOTAL
+                CODIGO_FACTURA,
+                IDENTIFICADOR_COMPROBANTE,
+                ID_EMPRESA,
+                ID_CLIENTE,
+                ID_TIPO_DOCUMENTO,
+                CODIGO_DIVISA,
+                ID_ESTADO,
+                FECHA_EMISION,
+                SUBTOTAL,
+                TOTAL_IMPUESTOS,
+                MONTO_TOTAL
             )
             SELECT
-                CODIGO_FACTURA, IDENTIFICADOR_COMPROBANTE, ID_EMPRESA, ID_CLIENTE,
-                ID_TIPO_DOCUMENTO, CODIGO_DIVISA, ID_ESTADO, FECHA_EMISION,
-                SUBTOTAL, TOTAL_IMPUESTOS, MONTO_TOTAL
+                CODIGO_FACTURA,
+                IDENTIFICADOR_COMPROBANTE,
+                ID_EMPRESA,
+                ID_CLIENTE,
+                ID_TIPO_DOCUMENTO,
+                CODIGO_DIVISA,
+                ID_ESTADO,
+                FECHA_EMISION,
+                SUBTOTAL,
+                TOTAL_IMPUESTOS,
+                MONTO_TOTAL
             FROM #LoteFacturas;
 
             INSERT INTO DBO.DETALLEFACTURA (
-                CODIGO_FACTURA, NUMERO_LINEA, CODIGO_PRODUCTO, DESCRIPCION,
-                CANTIDAD, PRECIO_UNITARIO, PORCENTAJE_IMPUESTO,
-                SUBTOTAL_LINEA, MONTO_IMPUESTO, MONTO_TOTAL_LINEA
+                CODIGO_FACTURA,
+                NUMERO_LINEA,
+                CODIGO_PRODUCTO,
+                DESCRIPCION,
+                CANTIDAD,
+                PRECIO_UNITARIO,
+                PORCENTAJE_IMPUESTO,
+                SUBTOTAL_LINEA,
+                MONTO_IMPUESTO,
+                MONTO_TOTAL_LINEA
             )
             SELECT
-                CODIGO_FACTURA, NUMERO_LINEA, CODIGO_PRODUCTO, DESCRIPCION,
-                CANTIDAD, PRECIO_UNITARIO, PORCENTAJE_IMPUESTO,
-                SUBTOTAL_LINEA, MONTO_IMPUESTO, MONTO_TOTAL_LINEA
+                CODIGO_FACTURA,
+                NUMERO_LINEA,
+                CODIGO_PRODUCTO,
+                DESCRIPCION,
+                CANTIDAD,
+                PRECIO_UNITARIO,
+                PORCENTAJE_IMPUESTO,
+                SUBTOTAL_LINEA,
+                MONTO_IMPUESTO,
+                MONTO_TOTAL_LINEA
             FROM #LoteDetalles;
 
             COMMIT TRANSACTION;
 
-            SET @FacturasProcesadas = @FacturasProcesadas + @TamanoLote;
+            SET @FacturasProcesadas
+                = @FacturasProcesadas + @TamanoLote;
         END TRY
         BEGIN CATCH
             IF XACT_STATE() <> 0
@@ -178,7 +252,9 @@ BEGIN
 END;
 GO
 
-EXEC DBO.PR_CARGARDATOSFACTURASYDETALLESTMP @TotalFacturas = 500000, @TamanoLote = 10000;
+EXEC DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
+    @TotalFacturas = 500000,
+    @TamanoLote = 10000;
 GO
 
 PRINT 'Carga masiva completada con exito.';
