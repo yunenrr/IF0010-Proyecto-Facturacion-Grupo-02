@@ -34,8 +34,7 @@ BEGIN
             STOCK_MINIMO,
             ESTADO
         )
-        SELECT
-            (@MAXCODIGOACTUAL + NUMEROS.N) AS CODIGO_ID,
+        SELECT (@MAXCODIGOACTUAL + NUMEROS.N) AS CODIGO_ID,
             CONCAT(
                 CASE (NUMEROS.N % 13)
                     WHEN 1 THEN 'Arroz'
