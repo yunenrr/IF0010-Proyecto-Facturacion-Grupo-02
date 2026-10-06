@@ -201,13 +201,13 @@ BEGIN
             FROM #LoteFacturas AS F
             INNER JOIN
             (
-                SELECT
+               SELECT
                     CODIGO_FACTURA,
                     SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
                     SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
                     SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
-                FROM #LoteDetalles
-                GROUP BY CODIGO_FACTURA
+               FROM #LoteDetalles
+               GROUP BY CODIGO_FACTURA
             ) AS T
                 ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
