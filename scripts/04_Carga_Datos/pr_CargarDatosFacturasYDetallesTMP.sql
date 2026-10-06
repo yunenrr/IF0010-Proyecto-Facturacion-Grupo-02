@@ -16,10 +16,10 @@ BEGIN
     DECLARE @FechaInicio DATETIME2 = DATEADD(YEAR, -1, SYSDATETIME());
     DECLARE @MaxCodigoActual INT;
 
-    SELECT @MaxCodigoActual = ISNULL(MAX(CODIGO_FACTURA), 0)
+    SELECT @MaxCodigoActual = ISNULL(MAX(F.CODIGO_FACTURA), 0)
     FROM DBO.FACTURA AS F;
 
-    -- tablas temporales de apoyo
+    -- Tablas temporales de apoyo
     CREATE TABLE #LoteFacturas (
         CODIGO_FACTURA INT PRIMARY KEY,
         IDENTIFICADOR_COMPROBANTE VARCHAR(100),
