@@ -14,16 +14,15 @@ BEGIN
     DECLARE @MAXCODIGOACTUAL INT;
 
     SELECT
-        @MAXCODIGOACTUAL =
-        ISNULL(MAX(CODIGO_ID), 0)
+        @MAXCODIGOACTUAL
+        = ISNULL(MAX(CODIGO_ID), 0)
     FROM DBO.PRODUCTO;
 
     BEGIN TRY
         BEGIN TRANSACTION;
 
         WITH NUMEROS AS (
-            SELECT 
-                TOP (@CANTIDAD)
+            SELECT TOP (@CANTIDAD)
                 ROW_NUMBER() OVER (
                     ORDER BY
                         (
