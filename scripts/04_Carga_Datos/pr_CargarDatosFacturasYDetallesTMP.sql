@@ -1,11 +1,11 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('dbo.pr_CargarDatosFacturasYDetallesTMP', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_CargarDatosFacturasYDetallesTMP;
+IF OBJECT_ID('DBO.pr_CargarDatosFacturasYDetallesTMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.pr_CargarDatosFacturasYDetallesTMP;
 GO
 
-CREATE PROCEDURE dbo.pr_CargarDatosFacturasYDetallesTMP
+CREATE PROCEDURE DBO.pr_CargarDatosFacturasYDetallesTMP
     @TotalFacturas INT = 500000,
     @TamanoLote INT = 10000
 AS
@@ -16,7 +16,7 @@ BEGIN
     DECLARE @FechaInicio DATETIME2 = DATEADD(YEAR, -1, SYSDATETIME());
     DECLARE @MaxCodigoActual INT;
 
-    SELECT @MaxCodigoActual = ISNULL(MAX(CODIGO_FACTURA), 0) FROM dbo.FACTURA AS F;
+    SELECT @MaxCodigoActual = ISNULL(MAX(CODIGO_FACTURA), 0) FROM DBO.FACTURA AS F;
 
     -- tablas temporales de apoyo
     CREATE TABLE #LoteFacturas (
@@ -57,7 +57,7 @@ BEGIN
             WITH NUMEROS AS (
                 SELECT TOP (@TamanoLote) 
                     ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
-                FROM sys.all_objects AS A CROSS JOIN sys.all_objects AS B
+                FROM SYS.ALL_OBJECTS AS A CROSS JOIN SYS.ALL_OBJECTS AS B
             ),
             DATOSCALCULADOS AS (
                 SELECT 
@@ -88,7 +88,7 @@ BEGIN
                 ) AS IDENTIFICADOR_COMPROBANTE,
                 D.FECHA_EMISION
             FROM DatosCalculados AS D
-            INNER JOIN dbo.TIPODOCUMENTO AS TD ON TD.ID_TIPO_DOCUMENTO = D.ID_TIPO_DOCUMENTO;
+            INNER JOIN DBO.TIPODOCUMENTO AS TD ON TD.ID_TIPO_DOCUMENTO = D.ID_TIPO_DOCUMENTO;
 
             INSERT INTO #LoteDetalles (
                 CODIGO_FACTURA, NUMERO_LINEA, CODIGO_PRODUCTO, DESCRIPCION,
@@ -109,21 +109,21 @@ BEGIN
             CROSS APPLY (
                 SELECT 
                     gs.N AS NUMEROLINEA,
-                    (((F.CODIGO_FACTURA * 13 + gs.N * 7) % 1000) + 1) AS CodigoProd,
-                    (((F.CODIGO_FACTURA * 3 + gs.N) % 5) + 1) AS Cantidad
+                    (((F.CODIGO_FACTURA * 13 + gs.N * 7) % 1000) + 1) AS CODIGOPROD,
+                    (((F.CODIGO_FACTURA * 3 + gs.N) % 5) + 1) AS CANTIDAD
                 FROM (
                     SELECT 1 AS N UNION ALL SELECT 2 UNION ALL SELECT 3 
                     UNION ALL SELECT 4 WHERE (f.CODIGO_FACTURA % 2) = 0
                     UNION ALL SELECT 5 WHERE (f.CODIGO_FACTURA % 3) = 0
                 ) AS GS
             ) AS D
-            INNER JOIN dbo.PRODUCTO AS P ON P.CODIGO_ID = D.CodigoProd;
+            INNER JOIN DBO.PRODUCTO AS P ON P.CODIGO_ID = D.CODIGOPROD;
 
             UPDATE F
             SET 
-                F.SUBTOTAL = T.SubtotalSum,
-                F.TOTAL_IMPUESTOS = T.ImpuestoSum,
-                F.MONTO_TOTAL = T.TotalSum
+                F.SUBTOTAL = T.SUBTOTALSUM,
+                F.TOTAL_IMPUESTOS = T.IMPUESTOSUM,
+                F.MONTO_TOTAL = T.TOTALSUM
             FROM #LoteFacturas AS F
             INNER JOIN (
                 SELECT 
@@ -135,7 +135,7 @@ BEGIN
                 GROUP BY CODIGO_FACTURA
             ) AS T ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
-            INSERT INTO dbo.FACTURA (
+            INSERT INTO DBO.FACTURA (
                 CODIGO_FACTURA, IDENTIFICADOR_COMPROBANTE, ID_EMPRESA, ID_CLIENTE, 
                 ID_TIPO_DOCUMENTO, CODIGO_DIVISA, ID_ESTADO, FECHA_EMISION, 
                 SUBTOTAL, TOTAL_IMPUESTOS, MONTO_TOTAL
@@ -146,7 +146,7 @@ BEGIN
                 SUBTOTAL, TOTAL_IMPUESTOS, MONTO_TOTAL
             FROM #LoteFacturas;
 
-            INSERT INTO dbo.DETALLEFACTURA (
+            INSERT INTO DBO.DETALLEFACTURA (
                 CODIGO_FACTURA, NUMERO_LINEA, CODIGO_PRODUCTO, DESCRIPCION, 
                 CANTIDAD, PRECIO_UNITARIO, PORCENTAJE_IMPUESTO, 
                 SUBTOTAL_LINEA, MONTO_IMPUESTO, MONTO_TOTAL_LINEA
@@ -165,8 +165,8 @@ BEGIN
             IF XACT_STATE() <> 0
                 ROLLBACK TRANSACTION;
 
-            IF OBJECT_ID('tempdb..#LoteFacturas') IS NOT NULL DROP TABLE #LoteFacturas;
-            IF OBJECT_ID('tempdb..#LoteDetalles') IS NOT NULL DROP TABLE #LoteDetalles;
+            IF OBJECT_ID('TEMPDB..#LoteFacturas') IS NOT NULL DROP TABLE #LoteFacturas;
+            IF OBJECT_ID('TEMPDB..#LoteDetalles') IS NOT NULL DROP TABLE #LoteDetalles;
 
             THROW;
         END CATCH
@@ -177,14 +177,14 @@ BEGIN
 END;
 GO
 
-EXEC dbo.pr_CargarDatosFacturasYDetallesTMP 
+EXEC DBO.pr_CargarDatosFacturasYDetallesTMP 
     @TotalFacturas = 500000, 
     @TamanoLote = 10000;
 PRINT 'Carga masiva completada con éxito.';
 GO
 
-IF OBJECT_ID('dbo.pr_CargarDatosFacturasYDetallesTMP', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_CargarDatosFacturasYDetallesTMP;
+IF OBJECT_ID('DBO.pr_CargarDatosFacturasYDetallesTMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.pr_CargarDatosFacturasYDetallesTMP;
 GO
 PRINT 'Procedimiento temporal eliminado correctamente.';
 GO
