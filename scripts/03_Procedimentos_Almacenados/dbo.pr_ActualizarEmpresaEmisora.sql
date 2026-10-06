@@ -29,9 +29,9 @@ BEGIN
             )
             BEGIN
                 THROW
-                    50008,
-                    'La empresa emisora especificada no existe en el sistema.',
-                    1;
+                50008,
+                'La empresa emisora especificada no existe en el sistema.',
+                1;
             END;
 
         IF
