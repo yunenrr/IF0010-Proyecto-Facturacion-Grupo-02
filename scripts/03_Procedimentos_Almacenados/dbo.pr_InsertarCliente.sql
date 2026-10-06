@@ -40,7 +40,13 @@ BEGIN
         )
             THROW 50015, 'La direccion especificada no existe.', 1;
 
+        DECLARE @NUEVOIDCLIENTE INT;
+
+        SELECT @NUEVOIDCLIENTE = ISNULL(MAX(ID_CLIENTE), 0) + 1
+        FROM DBO.CLIENTE;
+
         INSERT INTO DBO.CLIENTE (
+            ID_CLIENTE,
             CEDULA_CLIENTE,
             NOMBRE,
             ID_DIRECCION,
@@ -48,6 +54,7 @@ BEGIN
             CORREO
         )
         VALUES (
+            @NUEVOIDCLIENTE,
             @CEDULA_CLIENTE,
             @NOMBRE,
             @ID_DIRECCION,
