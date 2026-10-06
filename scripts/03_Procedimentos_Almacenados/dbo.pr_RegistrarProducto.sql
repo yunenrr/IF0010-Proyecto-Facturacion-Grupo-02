@@ -1,43 +1,85 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('dbo.pr_RegistrarProducto', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_RegistrarProducto;
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_REGISTRARPRODUCTO'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_REGISTRARPRODUCTO;
+    END;
 GO
-CREATE PROCEDURE dbo.pr_RegistrarProducto
-    @CodigoID INT,
-    @Descripcion VARCHAR(255),
-    @PrecioUnitario DECIMAL(18, 2),
-    @PorcentajeImpuesto DECIMAL(5, 2) = 13.00,
-    @StockActual INT = 0,
-    @StockMinimo INT = 0,
-    @Estado INT = 1
+
+CREATE PROCEDURE DBO.PR_REGISTRARPRODUCTO
+    @CODIGOID INT,
+    @DESCRIPCION VARCHAR(255),
+    @PRECIOUNITARIO DECIMAL(18, 2),
+    @PORCENTAJEIMPUESTO DECIMAL(5, 2) = 13.00,
+    @STOCKACTUAL INT = 0,
+    @STOCKMINIMO INT = 0,
+    @ESTADO INT = 1
 AS
 BEGIN
     SET NOCOUNT ON;
+
     BEGIN TRY
         BEGIN TRANSACTION;
-        IF EXISTS (SELECT 1 FROM dbo.PRODUCTO WHERE CODIGO_ID = @CodigoID)
-        BEGIN
-            THROW 50003, 'El Código ID del producto ya existe en la base de datos.', 1;
-        END
-        IF @PrecioUnitario < 0
-        BEGIN
-            THROW 50004, 'El precio unitario no puede ser negativo.', 1;
-        END
-        IF @PorcentajeImpuesto < 0 OR @PorcentajeImpuesto > 100
-        BEGIN
-            THROW 50005, 'El porcentaje de impuesto debe estar entre 0 y 100.', 1;
-        END
-        IF @StockActual < 0 OR @StockMinimo < 0
-        BEGIN
-            THROW 50006, 'El stock actual y el stock mínimo deben ser iguales o mayores a 0.', 1;
-        END
-        IF @Estado NOT IN (0, 1)
-        BEGIN
-            THROW 50007, 'El estado del producto debe ser 1 (Activo) o 0 (Inactivo).', 1;
-        END
-        INSERT INTO dbo.PRODUCTO (
+
+        IF
+            EXISTS (
+                SELECT 1
+                FROM DBO.PRODUCTO
+                WHERE
+                    CODIGO_ID = @CODIGOID
+            )
+            BEGIN
+                THROW
+                50003,
+                'El Código ID ya existe.',
+                1;
+            END;
+
+        IF @PRECIOUNITARIO < 0
+            BEGIN
+                THROW
+                50004,
+                'El precio unitario no puede ser negativo.',
+                1;
+            END;
+
+        IF
+            @PORCENTAJEIMPUESTO < 0
+            OR @PORCENTAJEIMPUESTO > 100
+            BEGIN
+                THROW
+                50005,
+                'El impuesto debe estar entre 0 y 100.',
+                1;
+            END;
+
+        IF
+            @STOCKACTUAL < 0
+            OR @STOCKMINIMO < 0
+            BEGIN
+                THROW
+                50006,
+                'El stock debe ser mayor o igual a 0.',
+                1;
+            END;
+
+        IF @ESTADO NOT IN (0, 1)
+            BEGIN
+                THROW
+                50007,
+                'El estado debe ser 1 o 0.',
+                1;
+            END;
+
+        INSERT INTO DBO.PRODUCTO (
             CODIGO_ID,
             DESCRIPCION,
             PRECIO_UNITARIO,
@@ -48,21 +90,27 @@ BEGIN
             FECHA_CREACION
         )
         VALUES (
-            @CodigoID,
-            TRIM(TRIM(@Descripcion)),
-            @PrecioUnitario,
-            @PorcentajeImpuesto,
-            @StockActual,
-            @StockMinimo,
-            @Estado,
+            @CODIGOID,
+            TRIM(@DESCRIPCION),
+            @PRECIOUNITARIO,
+            @PORCENTAJEIMPUESTO,
+            @STOCKACTUAL,
+            @STOCKMINIMO,
+            @ESTADO,
             SYSDATETIME()
         );
+
         IF @@ROWCOUNT = 0
-        BEGIN
-            THROW 50025, 'No se pudo realizar el registro del producto.', 1;
-        END
+            BEGIN
+                THROW
+                50025,
+                'No se pudo realizar el registro.',
+                1;
+            END;
+
         COMMIT TRANSACTION;
-        SELECT 
+
+        SELECT
             CODIGO_ID,
             DESCRIPCION,
             PRECIO_UNITARIO,
@@ -71,15 +119,17 @@ BEGIN
             STOCK_MINIMO,
             ESTADO,
             FECHA_CREACION
-        FROM dbo.PRODUCTO
-        WHERE CODIGO_ID = @CodigoID;
+        FROM DBO.PRODUCTO
+        WHERE
+            CODIGO_ID = @CODIGOID;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-        BEGIN
-            ROLLBACK TRANSACTION;
-        END;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
+
         THROW;
-    END CATCH
+    END CATCH;
 END;
 GO
