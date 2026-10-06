@@ -28,9 +28,9 @@ BEGIN
         CODIGO_DIVISA CHAR(3),
         ID_ESTADO INT,
         FECHA_EMISION DATETIME2,
-        SUBTOTAL DECIMAL(18,2) DEFAULT 0,
-        TOTAL_IMPUESTOS DECIMAL(18,2) DEFAULT 0,
-        MONTO_TOTAL DECIMAL(18,2) DEFAULT 0
+        SUBTOTAL DECIMAL(18, 2) DEFAULT 0,
+        TOTAL_IMPUESTOS DECIMAL(18, 2) DEFAULT 0,
+        MONTO_TOTAL DECIMAL(18, 2) DEFAULT 0
     );
 
     CREATE TABLE #LoteDetalles (
@@ -38,12 +38,12 @@ BEGIN
         NUMERO_LINEA INT,
         CODIGO_PRODUCTO INT,
         DESCRIPCION VARCHAR(255),
-        CANTIDAD DECIMAL(12,2),
-        PRECIO_UNITARIO DECIMAL(18,2),
-        PORCENTAJE_IMPUESTO DECIMAL(5,2),
-        SUBTOTAL_LINEA DECIMAL(18,2),
-        MONTO_IMPUESTO DECIMAL(18,2),
-        MONTO_TOTAL_LINEA DECIMAL(18,2)
+        CANTIDAD DECIMAL(12, 2),
+        PRECIO_UNITARIO DECIMAL(18, 2),
+        PORCENTAJE_IMPUESTO DECIMAL(5, 2),
+        SUBTOTAL_LINEA DECIMAL(18, 2),
+        MONTO_IMPUESTO DECIMAL(18, 2),
+        MONTO_TOTAL_LINEA DECIMAL(18, 2)
     );
 
     WHILE @FacturasProcesadas < @TotalFacturas
@@ -102,9 +102,9 @@ BEGIN
                 D.CANTIDAD,
                 p.PRECIO_UNITARIO,
                 p.PORCENTAJE_IMPUESTO,
-                CAST((d.Cantidad * p.PRECIO_UNITARIO) AS DECIMAL(18,2)) AS SUBTOTAL_LINEA,
-                CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (p.PORCENTAJE_IMPUESTO / 100.00)) AS DECIMAL(18,2)) AS MONTO_IMPUESTO,
-                CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (1 + (p.PORCENTAJE_IMPUESTO / 100.00))) AS DECIMAL(18,2)) AS MONTO_TOTAL_LINEA
+                CAST((d.Cantidad * p.PRECIO_UNITARIO) AS DECIMAL(18, 2)) AS SUBTOTAL_LINEA,
+                CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (p.PORCENTAJE_IMPUESTO / 100.00)) AS DECIMAL(18, 2)) AS MONTO_IMPUESTO,
+                CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (1 + (p.PORCENTAJE_IMPUESTO / 100.00))) AS DECIMAL(18, 2)) AS MONTO_TOTAL_LINEA
             FROM #LoteFacturas AS F
             CROSS APPLY (
                 SELECT 
@@ -128,9 +128,9 @@ BEGIN
             INNER JOIN (
                 SELECT 
                     CODIGO_FACTURA,
-                    SUM(SUBTOTAL_LINEA) AS SubtotalSum,
-                    SUM(MONTO_IMPUESTO) AS ImpuestoSum,
-                    SUM(MONTO_TOTAL_LINEA) AS TotalSum
+                    SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
+                    SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
+                    SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
                 FROM #LoteDetalles
                 GROUP BY CODIGO_FACTURA
             ) AS T ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
