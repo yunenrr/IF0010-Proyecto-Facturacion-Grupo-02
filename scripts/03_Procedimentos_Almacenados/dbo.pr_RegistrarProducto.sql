@@ -49,7 +49,7 @@ BEGIN
         )
         VALUES (
             @CodigoID,
-            LTRIM(RTRIM(@Descripcion)),
+            TRIM(TRIM(@Descripcion)),
             @PrecioUnitario,
             @PorcentajeImpuesto,
             @StockActual,
