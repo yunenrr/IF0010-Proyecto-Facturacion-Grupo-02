@@ -1,19 +1,10 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF
-    EXISTS (
-        SELECT 1
-        FROM SYS.OBJECTS
-        WHERE
-            NAME = 'PR_CARGARDATOSFACTURASYDETALLESTMP'
-            AND TYPE = 'P'
-    )
-    BEGIN
-        DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
-    END;
+IF OBJECT_ID('DBO.PR_CARGARDATOSFACTURASYDETALLESTMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
 GO
-    
+
 CREATE PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
     @TotalFacturas INT = 500000,
     @TamanoLote INT = 10000
@@ -62,20 +53,21 @@ BEGIN
     );
 
     WHILE @FacturasProcesadas < @TotalFacturas
-        BEGIN
-            BEGIN TRY
-                BEGIN TRANSACTION;
+    BEGIN
+        BEGIN TRY
+            BEGIN TRANSACTION;
 
-                TRUNCATE TABLE #LoteFacturas;
-                TRUNCATE TABLE #LoteDetalles;
+            TRUNCATE TABLE #LoteFacturas;
+            TRUNCATE TABLE #LoteDetalles;
 
-                WITH NUMEROS AS (
-                    SELECT TOP (@TamanoLote)
-                        ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
+            WITH NUMEROS AS (
+                SELECT TOP (@TamanoLote)
+                    ROW_NUMBER() OVER (
+                        ORDER BY (SELECT NULL)
+                    ) AS N
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
-                ),
-
+            ),
             DATOSCALCULADOS AS (
                 SELECT
                     (
@@ -98,7 +90,6 @@ BEGIN
                     ) AS FECHA_EMISION
                 FROM NUMEROS
             )
-
             INSERT INTO #LoteFacturas (
                 CODIGO_FACTURA,
                 ID_EMPRESA,
@@ -139,8 +130,7 @@ BEGIN
                 D.FECHA_EMISION
             FROM DATOSCALCULADOS AS D
             INNER JOIN DBO.TIPODOCUMENTO AS TD
-                ON D.ID_TIPO_DOCUMENTO
-                = TD.ID_TIPO_DOCUMENTO;
+                ON D.ID_TIPO_DOCUMENTO = TD.ID_TIPO_DOCUMENTO;
 
             INSERT INTO #LoteDetalles (
                 CODIGO_FACTURA,
