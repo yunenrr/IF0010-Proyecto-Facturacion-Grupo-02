@@ -1,13 +1,20 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_ActualizarEstadoFactura' AND type = 'P')
-BEGIN
-    DROP PROCEDURE dbo.pr_ActualizarEstadoFactura;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ACTUALIZARESTADOFACTURA'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ACTUALIZARESTADOFACTURA;
+    END;
 GO
 
-CREATE PROCEDURE dbo.pr_ActualizarEstadoFactura
+CREATE PROCEDURE DBO.PR_ACTUALIZARESTADOFACTURA
     @ID_ESTADO INT,
     @ESTADO VARCHAR(20),
     @DESCRIPCION_ESTADO VARCHAR(100)
@@ -19,27 +26,47 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.ESTADOFACTURA WHERE ID_ESTADO = @ID_ESTADO)
-            THROW 50120, 'El estado de factura especificado no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.ESTADOFACTURA
+                WHERE ID_ESTADO = @ID_ESTADO
+            )
+            BEGIN
+                THROW
+                    50120,
+                    'El estado de factura especificado no existe.',
+                    1;
+            END;
 
-        IF EXISTS (
-            SELECT 1 FROM dbo.ESTADOFACTURA
-            WHERE ESTADO = @ESTADO AND ID_ESTADO <> @ID_ESTADO
-        )
-            THROW 50121, 'Ya existe otro estado con ese nombre.', 1;
+        IF
+            EXISTS (
+                SELECT 1
+                FROM DBO.ESTADOFACTURA
+                WHERE
+                    ESTADO = @ESTADO
+                    AND ID_ESTADO <> @ID_ESTADO
+            )
+            BEGIN
+                THROW 50121, 'Ya existe otro estado con ese nombre.', 1;
+            END;
 
-        UPDATE dbo.ESTADOFACTURA
-        SET ESTADO = @ESTADO,
+        UPDATE DBO.ESTADOFACTURA
+        SET
+            ESTADO = @ESTADO,
             DESCRIPCION_ESTADO = @DESCRIPCION_ESTADO
-        WHERE ID_ESTADO = @ID_ESTADO;
+        WHERE
+            ID_ESTADO = @ID_ESTADO;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO
