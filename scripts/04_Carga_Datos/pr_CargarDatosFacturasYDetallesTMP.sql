@@ -177,24 +177,18 @@ BEGIN
                     ) + 1 AS CANTIDAD
                 FROM
                 (
-                        SELECT 
-                            1 AS N
-                        UNION ALL
-                        SELECT 
-                            2
-                        UNION ALL
-                        SELECT 
-                            3
-                        UNION ALL
-                        SELECT 
-                            4
-                        WHERE 
-                            (F.CODIGO_FACTURA % 2) = 0
-                        UNION ALL
-                        SELECT 
-                            5
-                        WHERE 
-                            (F.CODIGO_FACTURA % 3) = 0
+                    SELECT 
+                    1 AS N
+                    UNION ALL
+                    SELECT 2
+                    UNION ALL
+                    SELECT 3
+                    UNION ALL
+                    SELECT 4
+                    WHERE (F.CODIGO_FACTURA % 2) = 0
+                    UNION ALL
+                    SELECT 5
+                    WHERE (F.CODIGO_FACTURA % 3) = 0
                 ) AS GS
             ) AS D
             INNER JOIN DBO.PRODUCTO AS P
@@ -214,8 +208,7 @@ BEGIN
                     SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
                     SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
                FROM #LoteDetalles
-               GROUP BY 
-                    CODIGO_FACTURA
+               GROUP BY CODIGO_FACTURA
             ) AS T
                 ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
