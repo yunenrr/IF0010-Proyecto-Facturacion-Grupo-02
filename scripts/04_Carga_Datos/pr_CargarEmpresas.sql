@@ -35,21 +35,21 @@ BEGIN
 
         INSERT INTO #SUFIJOSCOMERCIALES (NOMBRE)
         VALUES
-            ('Tecnología'),
-            ('Supermercados'),
-            ('Farmacias'),
-            ('Librería'),
-            ('Ferretería'),
-            ('Restaurante'),
-            ('Distribuidora'),
-            ('Logística'),
-            ('Consultores'),
-            ('Inversiones'),
-            ('Automotriz'),
-            ('Servicios Digitales'),
-            ('Panadería'),
-            ('Agropecuaria'),
-            ('Boutique');
+        ('Tecnología'),
+        ('Supermercados'),
+        ('Farmacias'),
+        ('Librería'),
+        ('Ferretería'),
+        ('Restaurante'),
+        ('Distribuidora'),
+        ('Logística'),
+        ('Consultores'),
+        ('Inversiones'),
+        ('Automotriz'),
+        ('Servicios Digitales'),
+        ('Panadería'),
+        ('Agropecuaria'),
+        ('Boutique');
 
         CREATE TABLE #SUSTANTIVOSCOMERCIALES (
             ID INT IDENTITY (1, 1),
@@ -58,21 +58,21 @@ BEGIN
 
         INSERT INTO #SUSTANTIVOSCOMERCIALES (NOMBRE)
         VALUES
-            ('El Sol'),
-            ('La Estrella'),
-            ('San José'),
-            ('Del Caribe'),
-            ('Del Valle'),
-            ('Central'),
-            ('Costarricense'),
-            ('Irazú'),
-            ('Arenal'),
-            ('Tropicana'),
-            ('La Paz'),
-            ('Monteverde'),
-            ('Poás'),
-            ('La Sabana'),
-            ('Pacífico');
+        ('El Sol'),
+        ('La Estrella'),
+        ('San José'),
+        ('Del Caribe'),
+        ('Del Valle'),
+        ('Central'),
+        ('Costarricense'),
+        ('Irazú'),
+        ('Arenal'),
+        ('Tropicana'),
+        ('La Paz'),
+        ('Monteverde'),
+        ('Poás'),
+        ('La Sabana'),
+        ('Pacífico');
 
         DECLARE @ULTIMOSECUENCIAL INT = 0;
 
@@ -124,6 +124,7 @@ BEGIN
             END;
 
             IF @CODIGOPROVINCIA = 1
+            BEGIN
                 SET @CANTON = CASE @MOD4
                     WHEN 0
                         THEN 'San José'
@@ -133,7 +134,9 @@ BEGIN
                         THEN 'Desamparados'
                     ELSE 'Pérez Zeledón'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 2
+            BEGIN
                 SET @CANTON = CASE @MOD4
                     WHEN 0
                         THEN 'Alajuela'
@@ -143,7 +146,9 @@ BEGIN
                         THEN 'Grecia'
                     ELSE 'San Carlos'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 3
+            BEGIN
                 SET @CANTON = CASE @MOD4
                     WHEN 0
                         THEN 'Cartago'
@@ -153,7 +158,9 @@ BEGIN
                         THEN 'La Unión'
                     ELSE 'El Guarco'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 4
+            BEGIN
                 SET @CANTON = CASE @MOD4
                     WHEN 0
                         THEN 'Heredia'
@@ -163,7 +170,9 @@ BEGIN
                         THEN 'Santo Domingo'
                     ELSE 'Belén'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 5
+            BEGIN
                 SET @CANTON = CASE @MOD4
                     WHEN 0
                         THEN 'Liberia'
@@ -173,7 +182,9 @@ BEGIN
                         THEN 'Santa Cruz'
                     ELSE 'Bagaces'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 6
+            BEGIN
                 SET @CANTON = CASE @MOD4
                     WHEN 0
                         THEN 'Puntarenas'
@@ -183,7 +194,9 @@ BEGIN
                         THEN 'Quepos'
                     ELSE 'Golfito'
                 END;
+            END;
             ELSE
+            BEGIN
                 SET @CANTON = CASE @MOD4
                     WHEN 0
                         THEN 'Limón'
@@ -193,8 +206,10 @@ BEGIN
                         THEN 'Siquirres'
                     ELSE 'Talamanca'
                 END;
+            END;
 
             IF @CODIGOPROVINCIA = 1
+            BEGIN
                 SET @DISTRITO = CASE @MOD4
                     WHEN 0
                         THEN 'Carmen'
@@ -204,7 +219,9 @@ BEGIN
                         THEN 'San Antonio'
                     ELSE 'San Isidro'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 2
+            BEGIN
                 SET @DISTRITO = CASE @MOD4
                     WHEN 0
                         THEN 'San José'
@@ -214,7 +231,9 @@ BEGIN
                         THEN 'San Roque'
                     ELSE 'Quesada'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 3
+            BEGIN
                 SET @DISTRITO = CASE @MOD4
                     WHEN 0
                         THEN 'Oriental'
@@ -224,7 +243,9 @@ BEGIN
                         THEN 'Tres Ríos'
                     ELSE 'Tejar'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 4
+            BEGIN
                 SET @DISTRITO = CASE @MOD4
                     WHEN 0
                         THEN 'Mercedes'
@@ -234,7 +255,9 @@ BEGIN
                         THEN 'Santa Rosa'
                     ELSE 'San Antonio'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 5
+            BEGIN
                 SET @DISTRITO = CASE @MOD4
                     WHEN 0
                         THEN 'Liberia'
@@ -244,7 +267,9 @@ BEGIN
                         THEN 'Tamarindo'
                     ELSE 'Bagaces'
                 END;
+            END;
             ELSE IF @CODIGOPROVINCIA = 6
+            BEGIN
                 SET @DISTRITO = CASE @MOD4
                     WHEN 0
                         THEN 'Chacarita'
@@ -254,7 +279,9 @@ BEGIN
                         THEN 'Manuel Antonio'
                     ELSE 'Golfito'
                 END;
+            END;
             ELSE
+            BEGIN
                 SET @DISTRITO = CASE @MOD4
                     WHEN 0
                         THEN 'Limón'
@@ -264,6 +291,7 @@ BEGIN
                         THEN 'Siquirres'
                     ELSE 'Puerto Viejo'
                 END;
+            END;
 
             SET @SENAS = CASE (@I % 5)
                 WHEN 0
