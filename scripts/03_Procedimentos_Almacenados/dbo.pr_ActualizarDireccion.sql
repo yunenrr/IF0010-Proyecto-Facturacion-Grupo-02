@@ -1,48 +1,59 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (
-    SELECT 1
-    FROM sys.objects
-    WHERE name = 'pr_ActualizarDireccion' AND type = 'P'
-)
-BEGIN
-    DROP PROCEDURE dbo.pr_ActualizarDireccion;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ACTUALIZARDIRECCION'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ACTUALIZARDIRECCION;
+    END;
 GO
 
-CREATE PROCEDURE dbo.pr_ActualizarDireccion (
-    @DireccionId INT,
-    @Provincia VARCHAR(50),
-    @Canton VARCHAR(50),
-    @Distrito VARCHAR(50),
-    @SenasAdicionales VARCHAR(250) = NULL
+CREATE PROCEDURE DBO.PR_ACTUALIZARDIRECCION (
+    @DIRECCIONID INT,
+    @PROVINCIA VARCHAR(50),
+    @CANTON VARCHAR(50),
+    @DISTRITO VARCHAR(50),
+    @SENASADICIONALES VARCHAR(250) = NULL
 )
 AS
 BEGIN
-    SET NOCOUNT ON; 
+    SET NOCOUNT ON;
+
     BEGIN TRY
         BEGIN TRANSACTION;
-        UPDATE dbo.DIRECCION
+
+        UPDATE DBO.DIRECCION
         SET
-            PROVINCIA = @Provincia,
-            CANTON = @Canton,
-            DISTRITO = @Distrito,
-            SENAS_ADICIONALES = @SenasAdicionales
-        WHERE ID_DIRECCION = @DireccionId;
+            PROVINCIA = @PROVINCIA,
+            CANTON = @CANTON,
+            DISTRITO = @DISTRITO,
+            SENAS_ADICIONALES = @SENASADICIONALES
+        WHERE
+            ID_DIRECCION = @DIRECCIONID;
 
         IF @@ROWCOUNT = 0
-        BEGIN
-            THROW 50013, 'No se encontró ninguna dirección con el ID proporcionado.', 1;
-        END
+            BEGIN
+                THROW
+                50013,
+                'No se encontró ninguna dirección con el ID proporcionado.',
+                1;
+            END;
+
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-        BEGIN
-            ROLLBACK TRANSACTION;
-        END;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
+
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO
