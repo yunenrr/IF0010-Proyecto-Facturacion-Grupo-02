@@ -1,11 +1,11 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('dbo.pr_MigrarDivisaTMP', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_MigrarDivisaTMP;
+IF OBJECT_ID('DBO.PR_MIGRARDIVISATMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_MIGRARDIVISATMP;
 GO
 
-CREATE PROCEDURE dbo.pr_MigrarDivisaTMP
+CREATE PROCEDURE DBO.PR_MIGRARDIVISATMP
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -13,31 +13,45 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        INSERT INTO dbo.DIVISA (CODIGO_DIVISA, NOMBRE, SIMBOLO)
-        SELECT D.CODIGO_DIVISA, D.NOMBRE, D.SIMBOLO
-        FROM (VALUES 
-            ('CRC', 'Colón Costarricense', '₡'),
-            ('USD', 'Dólar Estadounidense', '$')
-        ) AS D(CODIGO_DIVISA, NOMBRE, SIMBOLO)
-        WHERE NOT EXISTS (
-            SELECT 1 FROM dbo.DIVISA div WHERE div.CODIGO_DIVISA = D.CODIGO_DIVISA
-        );
+        INSERT INTO DBO.DIVISA (
+            CODIGO_DIVISA,
+            NOMBRE,
+            SIMBOLO
+        )
+        SELECT
+            DIVISAS.CODIGO_DIVISA,
+            DIVISAS.NOMBRE,
+            DIVISAS.SIMBOLO
+        FROM
+            (
+                VALUES
+                ('CRC', 'Colón Costarricense', '₡'),
+                ('USD', 'Dólar Estadounidense', '$')
+            ) AS DIVISAS (CODIGO_DIVISA, NOMBRE, SIMBOLO)
+        WHERE
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.DIVISA
+                WHERE DBO.DIVISA.CODIGO_DIVISA = DIVISAS.CODIGO_DIVISA
+            );
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
+    END CATCH;
 END;
 GO
 
-EXEC dbo.pr_MigrarDivisaTMP;
+EXEC DBO.PR_MIGRARDIVISATMP;
 PRINT 'Carga de catálogo DIVISA completada con éxito.';
 GO
 
-IF OBJECT_ID('dbo.pr_MigrarDivisaTMP', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_MigrarDivisaTMP;
+IF OBJECT_ID('DBO.PR_MIGRARDIVISATMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_MIGRARDIVISATMP;
 GO
