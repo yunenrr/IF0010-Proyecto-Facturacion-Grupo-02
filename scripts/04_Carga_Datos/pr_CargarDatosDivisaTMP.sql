@@ -27,7 +27,7 @@ BEGIN
                 VALUES
                 ('CRC', 'Colón Costarricense', '₡'),
                 ('USD', 'Dólar Estadounidense', '$')
-            ) AS DIVISAS (CODIGO_DIVISA, NOMBRE, SIMBOLO)
+            ) AS DIVISAS(CODIGO_DIVISA, NOMBRE, SIMBOLO)
         WHERE
             NOT EXISTS (
                 SELECT 1
