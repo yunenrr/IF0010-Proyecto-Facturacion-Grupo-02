@@ -35,21 +35,21 @@ BEGIN
 
         INSERT INTO #SUFIJOSCOMERCIALES (NOMBRE)
         VALUES
-        ('Tecnología'),
-        ('Supermercados'),
-        ('Farmacias'),
-        ('Librería'),
-        ('Ferretería'),
-        ('Restaurante'),
-        ('Distribuidora'),
-        ('Logística'),
-        ('Consultores'),
-        ('Inversiones'),
-        ('Automotriz'),
-        ('Servicios Digitales'),
-        ('Panadería'),
-        ('Agropecuaria'),
-        ('Boutique');
+            ('Tecnología'),
+            ('Supermercados'),
+            ('Farmacias'),
+            ('Librería'),
+            ('Ferretería'),
+            ('Restaurante'),
+            ('Distribuidora'),
+            ('Logística'),
+            ('Consultores'),
+            ('Inversiones'),
+            ('Automotriz'),
+            ('Servicios Digitales'),
+            ('Panadería'),
+            ('Agropecuaria'),
+            ('Boutique');
 
         CREATE TABLE #SUSTANTIVOSCOMERCIALES (
             ID INT IDENTITY (1, 1),
@@ -58,21 +58,21 @@ BEGIN
 
         INSERT INTO #SUSTANTIVOSCOMERCIALES (NOMBRE)
         VALUES
-        ('El Sol'),
-        ('La Estrella'),
-        ('San José'),
-        ('Del Caribe'),
-        ('Del Valle'),
-        ('Central'),
-        ('Costarricense'),
-        ('Irazú'),
-        ('Arenal'),
-        ('Tropicana'),
-        ('La Paz'),
-        ('Monteverde'),
-        ('Poás'),
-        ('La Sabana'),
-        ('Pacífico');
+            ('El Sol'),
+            ('La Estrella'),
+            ('San José'),
+            ('Del Caribe'),
+            ('Del Valle'),
+            ('Central'),
+            ('Costarricense'),
+            ('Irazú'),
+            ('Arenal'),
+            ('Tropicana'),
+            ('La Paz'),
+            ('Monteverde'),
+            ('Poás'),
+            ('La Sabana'),
+            ('Pacífico');
 
         DECLARE @ULTIMOSECUENCIAL INT = 0;
 
@@ -108,102 +108,75 @@ BEGIN
             SET @MOD4 = @I % 4;
 
             SET @PROVINCIA = CASE @CODIGOPROVINCIA
-                WHEN 1
-                    THEN 'San José'
-                WHEN 2
-                    THEN 'Alajuela'
-                WHEN 3
-                    THEN 'Cartago'
-                WHEN 4
-                    THEN 'Heredia'
-                WHEN 5
-                    THEN 'Guanacaste'
-                WHEN 6
-                    THEN 'Puntarenas'
+                WHEN 1 THEN 'San José'
+                WHEN 2 THEN 'Alajuela'
+                WHEN 3 THEN 'Cartago'
+                WHEN 4 THEN 'Heredia'
+                WHEN 5 THEN 'Guanacaste'
+                WHEN 6 THEN 'Puntarenas'
                 ELSE 'Limón'
             END;
 
             IF @CODIGOPROVINCIA = 1
             BEGIN
                 SET @CANTON = CASE @MOD4
-                    WHEN 0
-                        THEN 'San José'
-                    WHEN 1
-                        THEN 'Escazú'
-                    WHEN 2
-                        THEN 'Desamparados'
+                    WHEN 0 THEN 'San José'
+                    WHEN 1 THEN 'Escazú'
+                    WHEN 2 THEN 'Desamparados'
                     ELSE 'Pérez Zeledón'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 2
             BEGIN
                 SET @CANTON = CASE @MOD4
-                    WHEN 0
-                        THEN 'Alajuela'
-                    WHEN 1
-                        THEN 'San Ramón'
-                    WHEN 2
-                        THEN 'Grecia'
+                    WHEN 0 THEN 'Alajuela'
+                    WHEN 1 THEN 'San Ramón'
+                    WHEN 2 THEN 'Grecia'
                     ELSE 'San Carlos'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 3
             BEGIN
                 SET @CANTON = CASE @MOD4
-                    WHEN 0
-                        THEN 'Cartago'
-                    WHEN 1
-                        THEN 'Paraíso'
-                    WHEN 2
-                        THEN 'La Unión'
+                    WHEN 0 THEN 'Cartago'
+                    WHEN 1 THEN 'Paraíso'
+                    WHEN 2 THEN 'La Unión'
                     ELSE 'El Guarco'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 4
             BEGIN
                 SET @CANTON = CASE @MOD4
-                    WHEN 0
-                        THEN 'Heredia'
-                    WHEN 1
-                        THEN 'Barva'
-                    WHEN 2
-                        THEN 'Santo Domingo'
+                    WHEN 0 THEN 'Heredia'
+                    WHEN 1 THEN 'Barva'
+                    WHEN 2 THEN 'Santo Domingo'
                     ELSE 'Belén'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 5
             BEGIN
                 SET @CANTON = CASE @MOD4
-                    WHEN 0
-                        THEN 'Liberia'
-                    WHEN 1
-                        THEN 'Nicoya'
-                    WHEN 2
-                        THEN 'Santa Cruz'
+                    WHEN 0 THEN 'Liberia'
+                    WHEN 1 THEN 'Nicoya'
+                    WHEN 2 THEN 'Santa Cruz'
                     ELSE 'Bagaces'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 6
             BEGIN
                 SET @CANTON = CASE @MOD4
-                    WHEN 0
-                        THEN 'Puntarenas'
-                    WHEN 1
-                        THEN 'Esparza'
-                    WHEN 2
-                        THEN 'Quepos'
+                    WHEN 0 THEN 'Puntarenas'
+                    WHEN 1 THEN 'Esparza'
+                    WHEN 2 THEN 'Quepos'
                     ELSE 'Golfito'
                 END;
-            END;
+            END
             ELSE
             BEGIN
                 SET @CANTON = CASE @MOD4
-                    WHEN 0
-                        THEN 'Limón'
-                    WHEN 1
-                        THEN 'Pocoçí'
-                    WHEN 2
-                        THEN 'Siquirres'
+                    WHEN 0 THEN 'Limón'
+                    WHEN 1 THEN 'Pocoçí'
+                    WHEN 2 THEN 'Siquirres'
                     ELSE 'Talamanca'
                 END;
             END;
@@ -211,111 +184,86 @@ BEGIN
             IF @CODIGOPROVINCIA = 1
             BEGIN
                 SET @DISTRITO = CASE @MOD4
-                    WHEN 0
-                        THEN 'Carmen'
-                    WHEN 1
-                        THEN 'San Rafael'
-                    WHEN 2
-                        THEN 'San Antonio'
+                    WHEN 0 THEN 'Carmen'
+                    WHEN 1 THEN 'San Rafael'
+                    WHEN 2 THEN 'San Antonio'
                     ELSE 'San Isidro'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 2
             BEGIN
                 SET @DISTRITO = CASE @MOD4
-                    WHEN 0
-                        THEN 'San José'
-                    WHEN 1
-                        THEN 'Santiago'
-                    WHEN 2
-                        THEN 'San Roque'
+                    WHEN 0 THEN 'San José'
+                    WHEN 1 THEN 'Santiago'
+                    WHEN 2 THEN 'San Roque'
                     ELSE 'Quesada'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 3
             BEGIN
                 SET @DISTRITO = CASE @MOD4
-                    WHEN 0
-                        THEN 'Oriental'
-                    WHEN 1
-                        THEN 'Orosi'
-                    WHEN 2
-                        THEN 'Tres Ríos'
+                    WHEN 0 THEN 'Oriental'
+                    WHEN 1 THEN 'Orosi'
+                    WHEN 2 THEN 'Tres Ríos'
                     ELSE 'Tejar'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 4
             BEGIN
                 SET @DISTRITO = CASE @MOD4
-                    WHEN 0
-                        THEN 'Mercedes'
-                    WHEN 1
-                        THEN 'San Pedro'
-                    WHEN 2
-                        THEN 'Santa Rosa'
+                    WHEN 0 THEN 'Mercedes'
+                    WHEN 1 THEN 'San Pedro'
+                    WHEN 2 THEN 'Santa Rosa'
                     ELSE 'San Antonio'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 5
             BEGIN
                 SET @DISTRITO = CASE @MOD4
-                    WHEN 0
-                        THEN 'Liberia'
-                    WHEN 1
-                        THEN 'Mansión'
-                    WHEN 2
-                        THEN 'Tamarindo'
+                    WHEN 0 THEN 'Liberia'
+                    WHEN 1 THEN 'Mansión'
+                    WHEN 2 THEN 'Tamarindo'
                     ELSE 'Bagaces'
                 END;
-            END;
+            END
             ELSE IF @CODIGOPROVINCIA = 6
             BEGIN
                 SET @DISTRITO = CASE @MOD4
-                    WHEN 0
-                        THEN 'Chacarita'
-                    WHEN 1
-                        THEN 'Espíritu Santo'
-                    WHEN 2
-                        THEN 'Manuel Antonio'
+                    WHEN 0 THEN 'Chacarita'
+                    WHEN 1 THEN 'Espíritu Santo'
+                    WHEN 2 THEN 'Manuel Antonio'
                     ELSE 'Golfito'
                 END;
-            END;
+            END
             ELSE
             BEGIN
                 SET @DISTRITO = CASE @MOD4
-                    WHEN 0
-                        THEN 'Limón'
-                    WHEN 1
-                        THEN 'Guápiles'
-                    WHEN 2
-                        THEN 'Siquirres'
+                    WHEN 0 THEN 'Limón'
+                    WHEN 1 THEN 'Guápiles'
+                    WHEN 2 THEN 'Siquirres'
                     ELSE 'Puerto Viejo'
                 END;
             END;
 
             SET @SENAS = CASE (@I % 5)
-                WHEN 0
-                    THEN CONCAT(
-                        CAST((@I % 300) + 25 AS VARCHAR),
-                        'm oeste del parque central, local #',
-                        CAST((@I % 15) + 1 AS VARCHAR)
-                    )
-                WHEN 1
-                    THEN CONCAT(
-                        'Contiguo a Banco Nacional, edif. ',
-                        CHAR(65 + (@I % 5)),
-                        ', piso ',
-                        CAST((@I % 4) + 1 AS VARCHAR)
-                    )
-                WHEN 2
-                    THEN '100m norte y 50m este de la iglesia'
-                WHEN 3
-                    THEN CONCAT(
-                        'Oficentro, Torre ',
-                        CAST((@I % 3) + 1 AS VARCHAR),
-                        ', ofic. ',
-                        CAST((@I % 20) + 101 AS VARCHAR)
-                    )
+                WHEN 0 THEN CONCAT(
+                    CAST((@I % 300) + 25 AS VARCHAR),
+                    'm oeste del parque central, local #',
+                    CAST((@I % 15) + 1 AS VARCHAR)
+                )
+                WHEN 1 THEN CONCAT(
+                    'Contiguo a Banco Nacional, edif. ',
+                    CHAR(65 + (@I % 5)),
+                    ', piso ',
+                    CAST((@I % 4) + 1 AS VARCHAR)
+                )
+                WHEN 2 THEN '100m norte y 50m este de la iglesia'
+                WHEN 3 THEN CONCAT(
+                    'Oficentro, Torre ',
+                    CAST((@I % 3) + 1 AS VARCHAR),
+                    ', ofic. ',
+                    CAST((@I % 20) + 101 AS VARCHAR)
+                )
                 ELSE CONCAT(
                     'Frente a gasolinera, local #',
                     CAST((@I % 10) + 1 AS VARCHAR)
@@ -328,20 +276,16 @@ BEGIN
             ORDER BY NEWID();
 
             SET @SUFIJO = CASE (@I % 3)
-                WHEN 0
-                    THEN 'CR'
-                WHEN 1
-                    THEN 'Tropic'
+                WHEN 0 THEN 'CR'
+                WHEN 1 THEN 'Tropic'
                 ELSE 'Solutions'
             END;
 
             SET @NOMBRECOMERCIAL = CONCAT(@NOMBREBASE, ' ', @SUFIJO);
 
             SET @TIPO_SOCIEDAD = CASE (@I % 3)
-                WHEN 0
-                    THEN ' Sociedad Anónima'
-                WHEN 1
-                    THEN ' S.A.'
+                WHEN 0 THEN ' Sociedad Anónima'
+                WHEN 1 THEN ' S.A.'
                 ELSE ' Limitada'
             END;
 
@@ -367,10 +311,8 @@ BEGIN
 
             SET @TELEFONO = CONCAT(
                 CASE (@I % 3)
-                    WHEN 0
-                        THEN '22'
-                    WHEN 1
-                        THEN '25'
+                    WHEN 0 THEN '22'
+                    WHEN 1 THEN '25'
                     ELSE '40'
                 END,
                 RIGHT(
