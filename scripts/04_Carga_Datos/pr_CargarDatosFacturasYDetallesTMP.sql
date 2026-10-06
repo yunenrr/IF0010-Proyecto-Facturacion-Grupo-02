@@ -178,22 +178,14 @@ BEGIN
                 FROM
                 (
                     SELECT 1 AS N
-
                     UNION ALL
-
                     SELECT 2
-
                     UNION ALL
-
                     SELECT 3
-
                     UNION ALL
-
                     SELECT 4
                     WHERE (F.CODIGO_FACTURA % 2) = 0
-
                     UNION ALL
-
                     SELECT 5
                     WHERE (F.CODIGO_FACTURA % 3) = 0
                 ) AS GS
