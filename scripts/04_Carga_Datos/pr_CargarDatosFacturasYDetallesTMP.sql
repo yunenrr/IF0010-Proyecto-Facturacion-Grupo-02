@@ -1,11 +1,11 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('DBO.pr_CargarDatosFacturasYDetallesTMP', 'P') IS NOT NULL
-    DROP PROCEDURE DBO.pr_CargarDatosFacturasYDetallesTMP;
+IF OBJECT_ID('DBO.PR_CARGARDATOSFACTURASYDETALLESTMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
 GO
 
-CREATE PROCEDURE DBO.pr_CargarDatosFacturasYDetallesTMP
+CREATE PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
     @TotalFacturas INT = 500000,
     @TamanoLote INT = 10000
 AS
@@ -16,7 +16,8 @@ BEGIN
     DECLARE @FechaInicio DATETIME2 = DATEADD(YEAR, -1, SYSDATETIME());
     DECLARE @MaxCodigoActual INT;
 
-    SELECT @MaxCodigoActual = ISNULL(MAX(F.CODIGO_FACTURA), 0)
+    SELECT
+        @MaxCodigoActual = ISNULL(MAX(F.CODIGO_FACTURA), 0)
     FROM DBO.FACTURA AS F;
 
     -- Tablas temporales de apoyo
@@ -103,7 +104,7 @@ BEGIN
                     REPLACE(
                         REPLACE(
                             REPLACE(
-                                CONVERT(VARCHAR(19), D.FECHA_EMISION, 120),
+                                CAST(D.FECHA_EMISION AS VARCHAR(19)),
                                 '-',
                                 ''
                             ),
@@ -168,17 +169,24 @@ BEGIN
                     (((F.CODIGO_FACTURA * 3 + GS.N) % 5) + 1)
                         AS CANTIDAD
                 FROM (
-                    SELECT 1 AS N
+                    SELECT
+                        1 AS N
                     UNION ALL
-                    SELECT 2
+                    SELECT
+                        2
                     UNION ALL
-                    SELECT 3
+                    SELECT
+                        3
                     UNION ALL
-                    SELECT 4
-                    WHERE (F.CODIGO_FACTURA % 2) = 0
+                    SELECT
+                        4
+                    WHERE
+                        (F.CODIGO_FACTURA % 2) = 0
                     UNION ALL
-                    SELECT 5
-                    WHERE (F.CODIGO_FACTURA % 3) = 0
+                    SELECT
+                        5
+                    WHERE
+                        (F.CODIGO_FACTURA % 3) = 0
                 ) AS GS
             ) AS D
             INNER JOIN DBO.PRODUCTO AS P
@@ -197,7 +205,8 @@ BEGIN
                     SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
                     SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
                 FROM #LoteDetalles
-                GROUP BY CODIGO_FACTURA
+                GROUP BY
+                    CODIGO_FACTURA
             ) AS T
                 ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
@@ -261,29 +270,29 @@ BEGIN
             IF XACT_STATE() <> 0
                 ROLLBACK TRANSACTION;
 
-            IF OBJECT_ID('TEMPDB..#LoteFacturas') IS NOT NULL
+            IF OBJECT_ID('TEMPDB..#LOTEFACTURAS') IS NOT NULL
                 DROP TABLE #LoteFacturas;
-            IF OBJECT_ID('TEMPDB..#LoteDetalles') IS NOT NULL
+            IF OBJECT_ID('TEMPDB..#LOTEDETALLES') IS NOT NULL
                 DROP TABLE #LoteDetalles;
 
             THROW;
         END CATCH
-    END
+    END;
 
     DROP TABLE #LoteFacturas;
     DROP TABLE #LoteDetalles;
 END;
 GO
 
-EXEC DBO.pr_CargarDatosFacturasYDetallesTMP
+EXEC DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
     @TotalFacturas = 500000,
     @TamanoLote = 10000;
 
 PRINT 'Carga masiva completada con éxito.';
 GO
 
-IF OBJECT_ID('DBO.pr_CargarDatosFacturasYDetallesTMP', 'P') IS NOT NULL
-    DROP PROCEDURE DBO.pr_CargarDatosFacturasYDetallesTMP;
+IF OBJECT_ID('DBO.PR_CARGARDATOSFACTURASYDETALLESTMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
 GO
 
 PRINT 'Procedimiento temporal eliminado correctamente.';
