@@ -1,5 +1,4 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
-
 GO
 
 IF OBJECT_ID('DBO.PR_CARGARDATOSFACTURASYDETALLESTMP', 'P') IS NOT NULL
@@ -13,9 +12,11 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @FacturasProcesadas INT = 0;
-    DECLARE @FechaInicio DATETIME2 = DATEADD(YEAR, -1, SYSDATETIME());
-    DECLARE @MaxCodigoActual INT;
+    DECLARE
+        @FacturasProcesadas INT = 0,
+        @FechaInicio DATETIME2
+            = DATEADD(YEAR, -1, SYSDATETIME()),
+        @MaxCodigoActual INT;
 
     SELECT
         @MaxCodigoActual = ISNULL(
@@ -23,7 +24,6 @@ BEGIN
         )
     FROM DBO.FACTURA AS F;
 
-    -- Tablas temporales de apoyo
     CREATE TABLE #LoteFacturas (
         CODIGO_FACTURA INT PRIMARY KEY,
         IDENTIFICADOR_COMPROBANTE VARCHAR(100),
@@ -65,9 +65,23 @@ BEGIN
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
                 ),
+            WITH NUMEROS AS (
+                SELECT TOP (@TamanoLote)
+                    ROW_NUMBER() OVER (
+                        ORDER BY (SELECT NULL)
+                    ) AS N
+                FROM SYS.ALL_OBJECTS AS A
+                CROSS JOIN SYS.ALL_OBJECTS AS B
+            ),
+
+>>>>>>> Stashed changes
             DATOSCALCULADOS AS (
                 SELECT
-                    (@MaxCodigoActual + @FacturasProcesadas + N) AS CODIGO_FACTURA,
+                    (
+                        @MaxCodigoActual
+                        + @FacturasProcesadas
+                        + N
+                    ) AS CODIGO_FACTURA,
                     ((N * 17) % 100) + 1 AS ID_EMPRESA,
                     ((N * 31) % 50000) + 1 AS ID_CLIENTE,
                     ((N % 4) + 1) AS ID_TIPO_DOCUMENTO,
@@ -105,7 +119,10 @@ BEGIN
                     REPLACE(
                         REPLACE(
                             REPLACE(
-                                CAST(D.FECHA_EMISION AS VARCHAR(19)),
+                                CAST(
+                                    D.FECHA_EMISION
+                                    AS VARCHAR(19)
+                                ),
                                 '-',
                                 ''
                             ),
@@ -121,7 +138,8 @@ BEGIN
                 D.FECHA_EMISION
             FROM DATOSCALCULADOS AS D
             INNER JOIN DBO.TIPODOCUMENTO AS TD
-                ON D.ID_TIPO_DOCUMENTO = TD.ID_TIPO_DOCUMENTO;
+                ON D.ID_TIPO_DOCUMENTO
+                = TD.ID_TIPO_DOCUMENTO;
 
             INSERT INTO #LoteDetalles (
                 CODIGO_FACTURA,
@@ -157,7 +175,12 @@ BEGIN
                 CAST(
                     (
                         (D.CANTIDAD * P.PRECIO_UNITARIO)
-                        * (1 + (P.PORCENTAJE_IMPUESTO / 100.00))
+                        * (
+                            1 + (
+                                P.PORCENTAJE_IMPUESTO
+                                / 100.00
+                            )
+                        )
                     )
                     AS DECIMAL(18, 2)
                 ) AS MONTO_TOTAL_LINEA
@@ -166,15 +189,16 @@ BEGIN
                 SELECT
                     GS.N AS NUMEROLINEA,
                     (
-                        (F.CODIGO_FACTURA * 13 + GS.N * 7) % 1000
+                        (
+                            F.CODIGO_FACTURA * 13
+                            + GS.N * 7
+                        ) % 1000
                     ) + 1 AS CODIGOPROD,
                     (
                         (F.CODIGO_FACTURA * 3 + GS.N) % 5
                     ) + 1 AS CANTIDAD
-                FROM
-                (
-                    SELECT 
-                        1 AS N
+                FROM (
+                    SELECT 1 AS N
                     UNION ALL
                     SELECT 2
                     UNION ALL
@@ -197,13 +221,13 @@ BEGIN
                 F.MONTO_TOTAL = T.TOTALSUM
             FROM #LoteFacturas AS F
             INNER JOIN (
-               SELECT
+                SELECT
                     CODIGO_FACTURA,
                     SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
                     SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
                     SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
-               FROM #LoteDetalles
-               GROUP BY CODIGO_FACTURA
+                FROM #LoteDetalles
+                GROUP BY CODIGO_FACTURA
             ) AS T
                 ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
@@ -261,7 +285,7 @@ BEGIN
 
             COMMIT TRANSACTION;
 
-            SET @FacturasProcesadas 
+            SET @FacturasProcesadas
                 = @FacturasProcesadas + @TamanoLote;
         END TRY
         BEGIN CATCH
