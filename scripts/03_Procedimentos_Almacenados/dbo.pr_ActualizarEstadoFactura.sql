@@ -34,9 +34,9 @@ BEGIN
             )
             BEGIN
                 THROW
-                    50120,
-                    'El estado de factura especificado no existe.',
-                    1;
+                50120,
+                'El estado de factura especificado no existe.',
+                 1;
             END;
 
         IF
