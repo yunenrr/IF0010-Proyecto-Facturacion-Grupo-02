@@ -69,7 +69,11 @@ BEGIN
             CONCAT(
                 '3-101-',
                 RIGHT('000000' + CAST(@ULTIMOSECUENCIAL + NUM AS VARCHAR), 6)
-            ) AS CEDULAGENERADA
+            ) AS CEDULAGENERADA,
+            CONCAT(
+                'Dirección temporal local #',
+                @ULTIMOSECUENCIAL + NUM
+            ) AS SENAS
         INTO #DATOSGENERADOS
         FROM SECUENCIA
         OPTION (MAXRECURSION 32767);
@@ -81,11 +85,10 @@ BEGIN
             SENAS_ADICIONALES
         )
         SELECT
-            NOMBREPROVINCIA,
-            'Cantón ' + CAST(NUM AS VARCHAR) AS CANTON,
-            'Distrito ' + CAST(NUM AS VARCHAR) AS DISTRITO,
-            'Dirección temporal local #'
-            + CAST(NUMEMPRESA AS VARCHAR) AS SENAS_ADICIONALES
+            D.NOMBREPROVINCIA,
+            'Cantón ' + CAST(D.NUM AS VARCHAR) AS CANTON,
+            'Distrito ' + CAST(D.NUM AS VARCHAR) AS DISTRITO,
+            D.SENAS AS SENAS_ADICIONALES
         FROM #DATOSGENERADOS AS D
         WHERE
             NOT EXISTS (
@@ -119,8 +122,7 @@ BEGIN
             1 AS ACTIVA
         FROM #DATOSGENERADOS AS D
         INNER JOIN DBO.DIRECCION AS DIR
-            ON DIR.SENAS_ADICIONALES = 'Dirección temporal local #'
-            + CAST(D.NUMEMPRESA AS VARCHAR)
+            ON DIR.SENAS_ADICIONALES = D.SENAS
         WHERE
             NOT EXISTS (
                 SELECT 1
