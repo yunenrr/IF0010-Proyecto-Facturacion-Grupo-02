@@ -235,9 +235,9 @@ BEGIN
                 IF @@ROWCOUNT = 0
                     BEGIN
                         THROW
-                            50014,
-                            'No se pudo registrar la dirección para el cliente.',
-                            1;
+                        50014,
+                        'No se pudo registrar la dirección para el cliente.',
+                        1;
                     END;
 
                 SET @NUEVOIDDIRECCION = SCOPE_IDENTITY();
@@ -321,9 +321,9 @@ BEGIN
         IF @FILASINSERTADAS = 0
             BEGIN
                 THROW
-                    50013,
-                    'No se procesó ninguna carga de clientes.',
-                    1;
+                50013,
+                'No se procesó ninguna carga de clientes.',
+                1;
             END;
 
         COMMIT TRANSACTION;
