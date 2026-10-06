@@ -32,7 +32,10 @@ BEGIN
                     CODIGO_ID = @CODIGO_ID
             )
             BEGIN
-                THROW 50101, 'El producto especificado no existe.', 1;
+                THROW
+                50101,
+                'El producto especificado no existe.',
+                1;
             END;
 
         IF
@@ -45,8 +48,7 @@ BEGIN
             BEGIN
                 THROW
                 50102,
-                'No se puede eliminar: el producto tiene detalles '
-                + 'de factura asociados.',
+                'No se puede eliminar: tiene facturas asociadas.',
                 1;
             END;
 
