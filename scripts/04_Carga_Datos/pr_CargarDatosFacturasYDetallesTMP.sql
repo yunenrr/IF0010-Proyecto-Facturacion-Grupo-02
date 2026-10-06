@@ -82,12 +82,12 @@ BEGIN
                 D.CODIGO_DIVISA,
                 D.ID_ESTADO,
                 CONCAT(
-                    REPLACE(REPLACE(REPLACE(CONVERT(VARCHAR(19), d.FECHA_EMISION, 120), '-', ''), ' ', ''), ':', ''), 
+                    REPLACE(REPLACE(REPLACE(CONVERT(VARCHAR(19), D.FECHA_EMISION, 120), '-', ''), ' ', ''), ':', ''), 
                     '-', 
                     TD.ID_TIPO_DOCUMENTO
                 ) AS IDENTIFICADOR_COMPROBANTE,
                 D.FECHA_EMISION
-            FROM DatosCalculados AS D
+            FROM DATOSCALCULADOS AS D
             INNER JOIN DBO.TIPODOCUMENTO AS TD ON TD.ID_TIPO_DOCUMENTO = D.ID_TIPO_DOCUMENTO;
 
             INSERT INTO #LoteDetalles (
@@ -97,24 +97,24 @@ BEGIN
             SELECT 
                 F.CODIGO_FACTURA,
                 D.NUMEROLINEA,
-                p.CODIGO_ID,
-                p.DESCRIPCION,
+                P.CODIGO_ID,
+                P.DESCRIPCION,
                 D.CANTIDAD,
-                p.PRECIO_UNITARIO,
-                p.PORCENTAJE_IMPUESTO,
-                CAST((d.Cantidad * p.PRECIO_UNITARIO) AS DECIMAL(18, 2)) AS SUBTOTAL_LINEA,
-                CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (p.PORCENTAJE_IMPUESTO / 100.00)) AS DECIMAL(18, 2)) AS MONTO_IMPUESTO,
-                CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (1 + (p.PORCENTAJE_IMPUESTO / 100.00))) AS DECIMAL(18, 2)) AS MONTO_TOTAL_LINEA
+                P.PRECIO_UNITARIO,
+                P.PORCENTAJE_IMPUESTO,
+                CAST((D.Cantidad * P.PRECIO_UNITARIO) AS DECIMAL(18, 2)) AS SUBTOTAL_LINEA,
+                CAST(((D.Cantidad * P.PRECIO_UNITARIO) * (P.PORCENTAJE_IMPUESTO / 100.00)) AS DECIMAL(18, 2)) AS MONTO_IMPUESTO,
+                CAST(((D.Cantidad * P.PRECIO_UNITARIO) * (1 + (P.PORCENTAJE_IMPUESTO / 100.00))) AS DECIMAL(18, 2)) AS MONTO_TOTAL_LINEA
             FROM #LoteFacturas AS F
             CROSS APPLY (
                 SELECT 
-                    gs.N AS NUMEROLINEA,
+                    GS.N AS NUMEROLINEA,
                     (((F.CODIGO_FACTURA * 13 + gs.N * 7) % 1000) + 1) AS CODIGOPROD,
                     (((F.CODIGO_FACTURA * 3 + gs.N) % 5) + 1) AS CANTIDAD
                 FROM (
                     SELECT 1 AS N UNION ALL SELECT 2 UNION ALL SELECT 3 
-                    UNION ALL SELECT 4 WHERE (f.CODIGO_FACTURA % 2) = 0
-                    UNION ALL SELECT 5 WHERE (f.CODIGO_FACTURA % 3) = 0
+                    UNION ALL SELECT 4 WHERE (F.CODIGO_FACTURA % 2) = 0
+                    UNION ALL SELECT 5 WHERE (F.CODIGO_FACTURA % 3) = 0
                 ) AS GS
             ) AS D
             INNER JOIN DBO.PRODUCTO AS P ON P.CODIGO_ID = D.CODIGOPROD;
