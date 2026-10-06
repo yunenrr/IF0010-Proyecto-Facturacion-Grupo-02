@@ -36,7 +36,7 @@ BEGIN
             (2, 'Tiquete Electrónico'),
             (3, 'Nota de Débito'),
             (4, 'Nota de Crédito')
-        ) AS T (ID_TIPO_DOCUMENTO, DESCRIPCION_TIPO_DOCUMENTO)
+        ) AS T(ID_TIPO_DOCUMENTO, DESCRIPCION_TIPO_DOCUMENTO)
         WHERE
             NOT EXISTS (
                 SELECT 1
