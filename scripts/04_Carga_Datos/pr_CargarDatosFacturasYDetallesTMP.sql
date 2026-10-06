@@ -1,3 +1,4 @@
+
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
@@ -69,16 +70,11 @@ BEGIN
             TRUNCATE TABLE #LoteFacturas;
             TRUNCATE TABLE #LoteDetalles;
 
-            WITH SECUENCIA AS (
-                SELECT TOP (@TamanoLote)
-                    ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
-                FROM SYS.ALL_OBJECTS AS A
-                CROSS JOIN SYS.ALL_OBJECTS AS B
-            )
-
             INSERT INTO #Numeros (N)
-            SELECT N
-            FROM SECUENCIA;
+            SELECT TOP (@TamanoLote)
+                ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
+            FROM SYS.ALL_OBJECTS AS A
+            CROSS JOIN SYS.ALL_OBJECTS AS B;
 
             INSERT INTO #LoteFacturas (
                 CODIGO_FACTURA,
@@ -120,6 +116,28 @@ BEGIN
                 ) AS FECHA_EMISION
             FROM #Numeros AS N;
 
+            WITH LINEAS AS (
+                SELECT
+                    F.CODIGO_FACTURA,
+                    X.NUMLINEA,
+                    ((F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000) + 1
+                        AS CODIGOPROD,
+                    ((F.CODIGO_FACTURA * 3 + X.NUMLINEA) % 5) + 1
+                        AS CANT
+                FROM #LoteFacturas AS F
+                CROSS JOIN (VALUES (1), (2), (3), (4), (5)) AS X(NUMLINEA)
+                WHERE
+                    X.NUMLINEA <= 3
+                    OR (
+                        X.NUMLINEA = 4
+                        AND (F.CODIGO_FACTURA % 2) = 0
+                    )
+                    OR (
+                        X.NUMLINEA = 5
+                        AND (F.CODIGO_FACTURA % 3) = 0
+                    )
+            )
+
             INSERT INTO #LoteDetalles (
                 CODIGO_FACTURA,
                 NUMERO_LINEA,
@@ -133,7 +151,7 @@ BEGIN
                 MONTO_TOTAL_LINEA
             )
             SELECT
-                F.CODIGO_FACTURA,
+                L.CODIGO_FACTURA,
                 L.NUMLINEA,
                 P.CODIGO_ID,
                 P.DESCRIPCION,
@@ -153,30 +171,9 @@ BEGIN
                     * (1 + P.PORCENTAJE_IMPUESTO / 100.00)
                     AS DECIMAL(18, 2)
                 ) AS MONTO_TOTAL_LINEA
-            FROM #LoteFacturas AS F
-            CROSS JOIN (VALUES (1), (2), (3), (4), (5)) AS X(NUMLINEA)
-            CROSS APPLY (
-                SELECT
-                    X.NUMLINEA,
-                    (
-                        (F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000
-                    ) + 1 AS CODIGOPROD,
-                    (
-                        (F.CODIGO_FACTURA * 3 + X.NUMLINEA) % 5
-                    ) + 1 AS CANT
-            ) AS L
+            FROM LINEAS AS L
             INNER JOIN DBO.PRODUCTO AS P
-                ON L.CODIGOPROD = P.CODIGO_ID
-            WHERE
-                X.NUMLINEA <= 3
-                OR (
-                    X.NUMLINEA = 4
-                    AND (F.CODIGO_FACTURA % 2) = 0
-                )
-                OR (
-                    X.NUMLINEA = 5
-                    AND (F.CODIGO_FACTURA % 3) = 0
-                );
+                ON L.CODIGOPROD = P.CODIGO_ID;
 
             WITH TOTALES AS (
                 SELECT
