@@ -52,19 +52,19 @@ BEGIN
     );
 
     WHILE @FacturasProcesadas < @TotalFacturas
-    BEGIN
-        BEGIN TRY
-            BEGIN TRANSACTION;
+        BEGIN
+            BEGIN TRY
+                BEGIN TRANSACTION;
 
-            TRUNCATE TABLE #LoteFacturas;
-            TRUNCATE TABLE #LoteDetalles;
+                TRUNCATE TABLE #LoteFacturas;
+                TRUNCATE TABLE #LoteDetalles;
 
-            WITH NUMEROS AS (
-                SELECT TOP (@TamanoLote)
-                    ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
+                WITH NUMEROS AS (
+                    SELECT TOP (@TamanoLote)
+                        ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
-            ),
+                ),
             DATOSCALCULADOS AS (
                 SELECT
                     (@MaxCodigoActual + @FacturasProcesadas + N) AS CODIGO_FACTURA,
