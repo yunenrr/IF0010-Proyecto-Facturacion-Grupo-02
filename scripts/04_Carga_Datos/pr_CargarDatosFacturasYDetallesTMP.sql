@@ -16,7 +16,7 @@ BEGIN
     DECLARE @FechaInicio DATETIME2 = DATEADD(YEAR, -1, SYSDATETIME());
     DECLARE @MaxCodigoActual INT;
 
-    SELECT @MaxCodigoActual = ISNULL(MAX(CODIGO_FACTURA), 0) FROM dbo.FACTURA;
+    SELECT @MaxCodigoActual = ISNULL(MAX(CODIGO_FACTURA), 0) FROM dbo.FACTURA AS F;
 
     -- tablas temporales de apoyo
     CREATE TABLE #LoteFacturas (
@@ -54,12 +54,12 @@ BEGIN
             TRUNCATE TABLE #LoteFacturas;
             TRUNCATE TABLE #LoteDetalles;
 
-            WITH Numeros AS (
+            WITH NUMEROS AS (
                 SELECT TOP (@TamanoLote) 
                     ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
-                FROM sys.all_objects a CROSS JOIN sys.all_objects b
+                FROM sys.all_objects AS A CROSS JOIN sys.all_objects AS B
             ),
-            DatosCalculados AS (
+            DATOSCALCULADOS AS (
                 SELECT 
                     (@MaxCodigoActual + @FacturasProcesadas + N) AS CODIGO_FACTURA,
                     ((N * 17) % 100) + 1 AS ID_EMPRESA,
@@ -68,63 +68,63 @@ BEGIN
                     CASE WHEN (N % 2) = 0 THEN 'CRC' ELSE 'USD' END AS CODIGO_DIVISA,
                     ((N % 4) + 1) AS ID_ESTADO,
                     DATEADD(SECOND, (N + @FacturasProcesadas) * 60, @FechaInicio) AS FECHA_EMISION
-                FROM Numeros
+                FROM NUMEROS
             )
             INSERT INTO #LoteFacturas (
                 CODIGO_FACTURA, ID_EMPRESA, ID_CLIENTE, ID_TIPO_DOCUMENTO, 
                 CODIGO_DIVISA, ID_ESTADO, IDENTIFICADOR_COMPROBANTE, FECHA_EMISION
             )
             SELECT 
-                d.CODIGO_FACTURA,
-                d.ID_EMPRESA,
-                d.ID_CLIENTE,
-                d.ID_TIPO_DOCUMENTO,
-                d.CODIGO_DIVISA,
-                d.ID_ESTADO,
+                D.CODIGO_FACTURA,
+                D.ID_EMPRESA,
+                D.ID_CLIENTE,
+                D.ID_TIPO_DOCUMENTO,
+                D.CODIGO_DIVISA,
+                D.ID_ESTADO,
                 CONCAT(
                     REPLACE(REPLACE(REPLACE(CONVERT(VARCHAR(19), d.FECHA_EMISION, 120), '-', ''), ' ', ''), ':', ''), 
                     '-', 
-                    td.ID_TIPO_DOCUMENTO
+                    TD.ID_TIPO_DOCUMENTO
                 ) AS IDENTIFICADOR_COMPROBANTE,
-                d.FECHA_EMISION
-            FROM DatosCalculados d
-            INNER JOIN dbo.TIPODOCUMENTO td ON td.ID_TIPO_DOCUMENTO = d.ID_TIPO_DOCUMENTO;
+                D.FECHA_EMISION
+            FROM DatosCalculados AS D
+            INNER JOIN dbo.TIPODOCUMENTO AS TD ON TD.ID_TIPO_DOCUMENTO = D.ID_TIPO_DOCUMENTO;
 
             INSERT INTO #LoteDetalles (
                 CODIGO_FACTURA, NUMERO_LINEA, CODIGO_PRODUCTO, DESCRIPCION,
                 CANTIDAD, PRECIO_UNITARIO, PORCENTAJE_IMPUESTO, SUBTOTAL_LINEA, MONTO_IMPUESTO, MONTO_TOTAL_LINEA
             )
             SELECT 
-                f.CODIGO_FACTURA,
-                d.NumeroLinea,
+                F.CODIGO_FACTURA,
+                D.NUMEROLINEA,
                 p.CODIGO_ID,
                 p.DESCRIPCION,
-                d.Cantidad,
+                D.CANTIDAD,
                 p.PRECIO_UNITARIO,
                 p.PORCENTAJE_IMPUESTO,
                 CAST((d.Cantidad * p.PRECIO_UNITARIO) AS DECIMAL(18,2)) AS SUBTOTAL_LINEA,
                 CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (p.PORCENTAJE_IMPUESTO / 100.00)) AS DECIMAL(18,2)) AS MONTO_IMPUESTO,
                 CAST(((d.Cantidad * p.PRECIO_UNITARIO) * (1 + (p.PORCENTAJE_IMPUESTO / 100.00))) AS DECIMAL(18,2)) AS MONTO_TOTAL_LINEA
-            FROM #LoteFacturas f
+            FROM #LoteFacturas AS F
             CROSS APPLY (
                 SELECT 
-                    gs.N AS NumeroLinea,
-                    (((f.CODIGO_FACTURA * 13 + gs.N * 7) % 1000) + 1) AS CodigoProd,
-                    (((f.CODIGO_FACTURA * 3 + gs.N) % 5) + 1) AS Cantidad
+                    gs.N AS NUMEROLINEA,
+                    (((F.CODIGO_FACTURA * 13 + gs.N * 7) % 1000) + 1) AS CodigoProd,
+                    (((F.CODIGO_FACTURA * 3 + gs.N) % 5) + 1) AS Cantidad
                 FROM (
                     SELECT 1 AS N UNION ALL SELECT 2 UNION ALL SELECT 3 
                     UNION ALL SELECT 4 WHERE (f.CODIGO_FACTURA % 2) = 0
                     UNION ALL SELECT 5 WHERE (f.CODIGO_FACTURA % 3) = 0
-                ) gs
-            ) d
-            INNER JOIN dbo.PRODUCTO p ON p.CODIGO_ID = d.CodigoProd;
+                ) AS GS
+            ) AS D
+            INNER JOIN dbo.PRODUCTO AS P ON P.CODIGO_ID = D.CodigoProd;
 
-            UPDATE f
+            UPDATE F
             SET 
-                f.SUBTOTAL = t.SubtotalSum,
-                f.TOTAL_IMPUESTOS = t.ImpuestoSum,
-                f.MONTO_TOTAL = t.TotalSum
-            FROM #LoteFacturas f
+                F.SUBTOTAL = T.SubtotalSum,
+                F.TOTAL_IMPUESTOS = T.ImpuestoSum,
+                F.MONTO_TOTAL = T.TotalSum
+            FROM #LoteFacturas AS F
             INNER JOIN (
                 SELECT 
                     CODIGO_FACTURA,
@@ -133,7 +133,7 @@ BEGIN
                     SUM(MONTO_TOTAL_LINEA) AS TotalSum
                 FROM #LoteDetalles
                 GROUP BY CODIGO_FACTURA
-            ) t ON f.CODIGO_FACTURA = t.CODIGO_FACTURA;
+            ) AS T ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
             INSERT INTO dbo.FACTURA (
                 CODIGO_FACTURA, IDENTIFICADOR_COMPROBANTE, ID_EMPRESA, ID_CLIENTE, 
