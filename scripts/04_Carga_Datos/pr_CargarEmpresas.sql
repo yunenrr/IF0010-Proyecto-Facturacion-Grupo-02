@@ -110,7 +110,7 @@ BEGIN
                 AS NOMBRE_COMERCIAL,
             CONCAT('Corporación Soluciones ', D.NUMEMPRESA, ' S.A.')
                 AS RAZON_SOCIAL,
-            DIR.ID_DIRECCION,
+                DIR.ID_DIRECCION,
             CONCAT('22', RIGHT('000000' + CAST(D.NUMEMPRESA AS VARCHAR), 6))
                 AS TELEFONO,
             CONCAT('contacto@empresa', D.NUMEMPRESA, '.com')
