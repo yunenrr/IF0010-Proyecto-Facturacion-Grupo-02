@@ -43,7 +43,8 @@ BEGIN
             BEGIN
                 THROW
                 50102,
-                'No se puede eliminar: el producto tiene detalles de factura asociados.',
+                'No se puede eliminar: el producto '
+                + 'tiene detalles de factura asociados.',
                 1;
             END;
 
