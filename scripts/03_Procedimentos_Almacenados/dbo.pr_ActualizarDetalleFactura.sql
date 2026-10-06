@@ -1,16 +1,14 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (
-    SELECT 1
-    FROM SYS.OBJECTS
-    WHERE
-        NAME = 'PR_ACTUALIZARDETALLEFACTURA'
-        AND TYPE = 'P'
-)
-BEGIN
-    DROP PROCEDURE DBO.PR_ACTUALIZARDETALLEFACTURA;
-END
+IF
+    EXISTS (
+        SELECT 1 FROM SYS.OBJECTS
+        WHERE NAME = 'pr_ActualizarDetalleFactura' AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ACTUALIZARDETALLEFACTURA;
+    END
 GO
 
 CREATE PROCEDURE DBO.PR_ACTUALIZARDETALLEFACTURA
@@ -26,37 +24,29 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (
-            SELECT 1
-            FROM DBO.DETALLEFACTURA
-            WHERE
-                CODIGO_FACTURA = @CODIGO_FACTURA
-                AND ID_DETALLE = @ID_DETALLE
-        )
-        BEGIN
+        IF
+            NOT EXISTS (
+                SELECT 1 FROM DBO.DETALLEFACTURA
+                WHERE
+                    CODIGO_FACTURA = @CODIGO_FACTURA
+                    AND ID_DETALLE = @ID_DETALLE
+            )
             THROW 50071, 'El detalle especificado no existe.', 1;
-        END
 
         IF @CANTIDAD <= 0
-        BEGIN
             THROW 50072, 'La cantidad debe ser mayor a cero.', 1;
-        END
 
         UPDATE DBO.DETALLEFACTURA
         SET
             CANTIDAD = @CANTIDAD,
             PORCENTAJE_DESCUENTO = @PORCENTAJE_DESCUENTO
-        WHERE
-            CODIGO_FACTURA = @CODIGO_FACTURA
-            AND ID_DETALLE = @ID_DETALLE;
+        WHERE CODIGO_FACTURA = @CODIGO_FACTURA AND ID_DETALLE = @ID_DETALLE;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-        BEGIN
             ROLLBACK TRANSACTION;
-        END
 
         THROW;
     END CATCH
