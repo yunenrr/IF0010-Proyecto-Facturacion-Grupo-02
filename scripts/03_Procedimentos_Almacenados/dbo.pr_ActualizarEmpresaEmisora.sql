@@ -59,9 +59,9 @@ BEGIN
         IF @CORREO NOT LIKE '%_@__%._%'
             BEGIN
                 THROW
-                    50009,
-                    'El formato del correo electrónico es inválido.',
-                    1;
+                50009,
+                'El formato del correo electrónico es inválido.',
+                1;
             END;
 
         UPDATE DBO.EMPRESAEMISORA
