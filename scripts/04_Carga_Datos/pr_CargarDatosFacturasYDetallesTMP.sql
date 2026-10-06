@@ -11,6 +11,7 @@ CREATE PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE
         @FacturasProcesadas INT = 0,
@@ -52,13 +53,19 @@ BEGIN
     );
 
     WHILE @FacturasProcesadas < @TotalFacturas
-    BEGIN
-        BEGIN TRY
-            BEGIN TRANSACTION;
+        BEGIN
+            BEGIN TRY
+                BEGIN TRANSACTION;
 
-            TRUNCATE TABLE #LoteFacturas;
-            TRUNCATE TABLE #LoteDetalles;
+                TRUNCATE TABLE #LoteFacturas;
+                TRUNCATE TABLE #LoteDetalles;
 
+                WITH NUMEROS AS (
+                    SELECT TOP (@TamanoLote)
+                        ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
+                FROM SYS.ALL_OBJECTS AS A
+                CROSS JOIN SYS.ALL_OBJECTS AS B
+                ),
             WITH NUMEROS AS (
                 SELECT TOP (@TamanoLote)
                     ROW_NUMBER() OVER (
@@ -67,6 +74,7 @@ BEGIN
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
             ),
+
             DATOSCALCULADOS AS (
                 SELECT
                     (
@@ -89,6 +97,7 @@ BEGIN
                     ) AS FECHA_EMISION
                 FROM NUMEROS
             )
+
             INSERT INTO #LoteFacturas (
                 CODIGO_FACTURA,
                 ID_EMPRESA,
@@ -129,7 +138,8 @@ BEGIN
                 D.FECHA_EMISION
             FROM DATOSCALCULADOS AS D
             INNER JOIN DBO.TIPODOCUMENTO AS TD
-                ON D.ID_TIPO_DOCUMENTO = TD.ID_TIPO_DOCUMENTO;
+                ON D.ID_TIPO_DOCUMENTO
+                = TD.ID_TIPO_DOCUMENTO;
 
             INSERT INTO #LoteDetalles (
                 CODIGO_FACTURA,
