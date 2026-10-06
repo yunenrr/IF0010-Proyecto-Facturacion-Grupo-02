@@ -1,13 +1,17 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_EliminarCliente' AND type = 'P')
-BEGIN
-    DROP PROCEDURE dbo.pr_EliminarCliente;
-END
+IF
+    EXISTS (
+        SELECT 1 FROM SYS.OBJECTS
+        WHERE NAME = 'pr_EliminarCliente' AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ELIMINARCLIENTE;
+    END
 GO
 
-CREATE PROCEDURE dbo.pr_EliminarCliente
+CREATE PROCEDURE DBO.PR_ELIMINARCLIENTE
     @ID_CLIENTE INT
 AS
 BEGIN
@@ -17,13 +21,23 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.CLIENTE WHERE ID_CLIENTE = @ID_CLIENTE)
+        IF
+            NOT EXISTS (
+                SELECT 1 FROM DBO.CLIENTE
+                WHERE ID_CLIENTE = @ID_CLIENTE
+            )
             THROW 50018, 'El cliente especificado no existe.', 1;
 
-        IF EXISTS (SELECT 1 FROM dbo.FACTURA WHERE ID_CLIENTE = @ID_CLIENTE)
-            THROW 50019, 'No se puede eliminar: el cliente tiene facturas asociadas.', 1;
+        IF
+            EXISTS (
+                SELECT 1 FROM DBO.FACTURA
+                WHERE ID_CLIENTE = @ID_CLIENTE
+            )
+            THROW 50019,
+                'No se puede eliminar: el cliente tiene facturas asociadas.',
+                1;
 
-        DELETE FROM dbo.CLIENTE
+        DELETE FROM DBO.CLIENTE
         WHERE ID_CLIENTE = @ID_CLIENTE;
 
         COMMIT TRANSACTION;
