@@ -46,9 +46,9 @@ BEGIN
         IF @PORCENTAJE_IMPUESTO NOT BETWEEN 0 AND 100
             BEGIN
                 THROW
-                 50105,
-                 'El porcentaje de impuesto debe estar entre 0 y 100.',
-                 1;
+                50105,
+                'El porcentaje de impuesto debe estar entre 0 y 100.',
+                1;
             END;
 
         UPDATE DBO.PRODUCTO
