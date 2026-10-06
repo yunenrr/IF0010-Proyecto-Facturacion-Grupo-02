@@ -13,16 +13,11 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    DECLARE
-        @FacturasProcesadas INT = 0,
-        @FechaInicio DATETIME2
-            = DATEADD(YEAR, -1, SYSDATETIME()),
-        @MaxCodigoActual INT;
+    DECLARE @FacturasProcesadas INT = 0;
+    DECLARE @FechaInicio DATETIME2 = DATEADD(YEAR, -1, SYSDATETIME());
+    DECLARE @MaxCodigoActual INT;
 
-    SELECT
-        @MaxCodigoActual = ISNULL(
-            MAX(F.CODIGO_FACTURA), 0
-        )
+    SELECT @MaxCodigoActual = ISNULL(MAX(F.CODIGO_FACTURA), 0)
     FROM DBO.FACTURA AS F;
 
     CREATE TABLE #LoteFacturas (
@@ -61,34 +56,20 @@ BEGIN
             TRUNCATE TABLE #LoteDetalles;
 
             WITH NUMEROS AS (
-                SELECT TOP (@TamanoLote)
-                    ROW_NUMBER() OVER (
-                        ORDER BY (SELECT NULL)
-                    ) AS N
+                SELECT TOP (@TamanoLote) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
             ),
 
             DATOSCALCULADOS AS (
                 SELECT
-                    (
-                        @MaxCodigoActual
-                        + @FacturasProcesadas
-                        + N
-                    ) AS CODIGO_FACTURA,
+                    (@MaxCodigoActual + @FacturasProcesadas + N) AS CODIGO_FACTURA,
                     ((N * 17) % 100) + 1 AS ID_EMPRESA,
                     ((N * 31) % 50000) + 1 AS ID_CLIENTE,
                     ((N % 4) + 1) AS ID_TIPO_DOCUMENTO,
-                    CASE
-                        WHEN (N % 2) = 0 THEN 'CRC'
-                        ELSE 'USD'
-                    END AS CODIGO_DIVISA,
+                    CASE WHEN (N % 2) = 0 THEN 'CRC' ELSE 'USD' END AS CODIGO_DIVISA,
                     ((N % 4) + 1) AS ID_ESTADO,
-                    DATEADD(
-                        SECOND,
-                        (N + @FacturasProcesadas) * 60,
-                        @FechaInicio
-                    ) AS FECHA_EMISION
+                    DATEADD(SECOND, (N + @FacturasProcesadas) * 60, @FechaInicio) AS FECHA_EMISION
                 FROM NUMEROS
             )
 
@@ -110,22 +91,7 @@ BEGIN
                 D.CODIGO_DIVISA,
                 D.ID_ESTADO,
                 CONCAT(
-                    REPLACE(
-                        REPLACE(
-                            REPLACE(
-                                CAST(
-                                    D.FECHA_EMISION
-                                    AS VARCHAR(19)
-                                ),
-                                '-',
-                                ''
-                            ),
-                            ' ',
-                            ''
-                        ),
-                        ':',
-                        ''
-                    ),
+                    REPLACE(REPLACE(REPLACE(CAST(D.FECHA_EMISION AS VARCHAR(19)), '-', ''), ' ', ''), ':', ''),
                     '-',
                     TD.ID_TIPO_DOCUMENTO
                 ) AS IDENTIFICADOR_COMPROBANTE,
@@ -154,42 +120,21 @@ BEGIN
                 D.CANTIDAD,
                 P.PRECIO_UNITARIO,
                 P.PORCENTAJE_IMPUESTO,
+                CAST((D.CANTIDAD * P.PRECIO_UNITARIO) AS DECIMAL(18, 2)) AS SUBTOTAL_LINEA,
                 CAST(
-                    (D.CANTIDAD * P.PRECIO_UNITARIO)
-                    AS DECIMAL(18, 2)
-                ) AS SUBTOTAL_LINEA,
-                CAST(
-                    (
-                        (D.CANTIDAD * P.PRECIO_UNITARIO)
-                        * (P.PORCENTAJE_IMPUESTO / 100.00)
-                    )
+                    (D.CANTIDAD * P.PRECIO_UNITARIO) * (P.PORCENTAJE_IMPUESTO / 100.00)
                     AS DECIMAL(18, 2)
                 ) AS MONTO_IMPUESTO,
                 CAST(
-                    (
-                        (D.CANTIDAD * P.PRECIO_UNITARIO)
-                        * (
-                            1 + (
-                                P.PORCENTAJE_IMPUESTO
-                                / 100.00
-                            )
-                        )
-                    )
+                    (D.CANTIDAD * P.PRECIO_UNITARIO) * (1 + (P.PORCENTAJE_IMPUESTO / 100.00))
                     AS DECIMAL(18, 2)
                 ) AS MONTO_TOTAL_LINEA
             FROM #LoteFacturas AS F
             CROSS APPLY (
                 SELECT
                     GS.N AS NUMEROLINEA,
-                    (
-                        (
-                            F.CODIGO_FACTURA * 13
-                            + GS.N * 7
-                        ) % 1000
-                    ) + 1 AS CODIGOPROD,
-                    (
-                        (F.CODIGO_FACTURA * 3 + GS.N) % 5
-                    ) + 1 AS CANTIDAD
+                    ((F.CODIGO_FACTURA * 13 + GS.N * 7) % 1000) + 1 AS CODIGOPROD,
+                    ((F.CODIGO_FACTURA * 3 + GS.N) % 5) + 1 AS CANTIDAD
                 FROM (
                     SELECT 1 AS N
                     UNION ALL
@@ -278,8 +223,7 @@ BEGIN
 
             COMMIT TRANSACTION;
 
-            SET @FacturasProcesadas
-                = @FacturasProcesadas + @TamanoLote;
+            SET @FacturasProcesadas = @FacturasProcesadas + @TamanoLote;
         END TRY
         BEGIN CATCH
             IF XACT_STATE() <> 0
@@ -303,6 +247,7 @@ GO
 EXEC DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
     @TotalFacturas = 500000,
     @TamanoLote = 10000;
+GO
 
 PRINT 'Carga masiva completada con éxito.';
 GO
