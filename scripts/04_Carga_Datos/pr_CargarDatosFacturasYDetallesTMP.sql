@@ -60,12 +60,13 @@ BEGIN
             TRUNCATE TABLE #LoteFacturas;
             TRUNCATE TABLE #LoteDetalles;
 
-            ;WITH SECUENCIA AS (
+            WITH SECUENCIA AS (
                 SELECT TOP (@TamanoLote)
                     ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
             )
+
             INSERT INTO #Numeros (N)
             SELECT N
             FROM SECUENCIA;
@@ -81,12 +82,16 @@ BEGIN
                 FECHA_EMISION
             )
             SELECT
-                @MaxCodigoActual + @FacturasProcesadas + N.N,
-                ((N.N * 17) % 100) + 1,
-                ((N.N * 31) % 50000) + 1,
-                ((N.N % 4) + 1),
-                CASE WHEN (N.N % 2) = 0 THEN 'CRC' ELSE 'USD' END,
-                ((N.N % 4) + 1),
+                @MaxCodigoActual + @FacturasProcesadas + N.N
+                    AS CODIGO_FACTURA,
+                ((N.N * 17) % 100) + 1 AS ID_EMPRESA,
+                ((N.N * 31) % 50000) + 1 AS ID_CLIENTE,
+                ((N.N % 4) + 1) AS ID_TIPO_DOCUMENTO,
+                CASE
+                    WHEN (N.N % 2) = 0 THEN 'CRC'
+                    ELSE 'USD'
+                END AS CODIGO_DIVISA,
+                ((N.N % 4) + 1) AS ID_ESTADO,
                 CONCAT(
                     FORMAT(
                         DATEADD(
@@ -98,12 +103,12 @@ BEGIN
                     ),
                     '-',
                     ((N.N % 4) + 1)
-                ),
+                ) AS IDENTIFICADOR_COMPROBANTE,
                 DATEADD(
                     SECOND,
                     (N.N + @FacturasProcesadas) * 60,
                     @FechaInicio
-                )
+                ) AS FECHA_EMISION
             FROM #Numeros AS N;
 
             INSERT INTO #LoteDetalles (
@@ -128,22 +133,22 @@ BEGIN
                 P.PORCENTAJE_IMPUESTO,
                 CAST(
                     L.CANT * P.PRECIO_UNITARIO AS DECIMAL(18, 2)
-                ),
+                ) AS SUBTOTAL_LINEA,
                 CAST(
                     L.CANT * P.PRECIO_UNITARIO
                     * P.PORCENTAJE_IMPUESTO / 100.00
                     AS DECIMAL(18, 2)
-                ),
+                ) AS MONTO_IMPUESTO,
                 CAST(
                     L.CANT * P.PRECIO_UNITARIO
                     * (1 + P.PORCENTAJE_IMPUESTO / 100.00)
                     AS DECIMAL(18, 2)
-                )
+                ) AS MONTO_TOTAL_LINEA
             FROM #LoteFacturas AS F
             CROSS JOIN (VALUES (1), (2), (3), (4), (5)) AS X(NUMLINEA)
             CROSS APPLY (
                 SELECT
-                    X.NUMLINEA AS NUMLINEA,
+                    X.NUMLINEA,
                     (
                         (F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000
                     ) + 1 AS CODIGOPROD,
@@ -164,13 +169,7 @@ BEGIN
                     AND (F.CODIGO_FACTURA % 3) = 0
                 );
 
-            UPDATE F
-            SET
-                F.SUBTOTAL = T.SUBTOTALSUM,
-                F.TOTAL_IMPUESTOS = T.IMPUESTOSUM,
-                F.MONTO_TOTAL = T.TOTALSUM
-            FROM #LoteFacturas AS F
-            INNER JOIN (
+            WITH TOTALES AS (
                 SELECT
                     CODIGO_FACTURA,
                     SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
@@ -178,7 +177,15 @@ BEGIN
                     SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
                 FROM #LoteDetalles
                 GROUP BY CODIGO_FACTURA
-            ) AS T
+            )
+
+            UPDATE F
+            SET
+                F.SUBTOTAL = T.SUBTOTALSUM,
+                F.TOTAL_IMPUESTOS = T.IMPUESTOSUM,
+                F.MONTO_TOTAL = T.TOTALSUM
+            FROM #LoteFacturas AS F
+            INNER JOIN TOTALES AS T
                 ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
             INSERT INTO DBO.FACTURA (
