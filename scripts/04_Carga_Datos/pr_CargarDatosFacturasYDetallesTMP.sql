@@ -58,7 +58,8 @@ BEGIN
             TRUNCATE TABLE #LoteDetalles;
 
             WITH NUMEROS AS (
-                SELECT TOP (@TamanoLote)
+                SELECT 
+                TOP (@TamanoLote)
                     ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
