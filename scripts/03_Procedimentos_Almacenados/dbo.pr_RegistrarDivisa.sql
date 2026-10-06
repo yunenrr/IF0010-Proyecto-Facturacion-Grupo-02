@@ -24,9 +24,9 @@ BEGIN
             )
             BEGIN
                 THROW
-                    50014,
-                    'El código de divisa ya se encuentra registrado.',
-                    1;
+                50014,
+                'El código de divisa ya se encuentra registrado.',
+                1;
             END;
 
         INSERT INTO DBO.DIVISA (
