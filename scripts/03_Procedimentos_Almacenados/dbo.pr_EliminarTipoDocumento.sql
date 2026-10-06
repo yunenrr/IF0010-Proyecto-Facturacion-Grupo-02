@@ -31,9 +31,8 @@ BEGIN
                 WHERE ID_TIPO_DOCUMENTO = @ID_TIPO_DOCUMENTO
             )
             BEGIN
-                THROW 
-                50110, 
-                'El tipo de documento especificado no existe.', 
+                THROW 50110,
+                'El tipo de documento especificado no existe.',
                 1;
             END;
 
@@ -46,7 +45,8 @@ BEGIN
             BEGIN
                 THROW
                 50111,
-                'No se puede eliminar: el tipo de documento está asociado a facturas.',
+                'No se puede eliminar:
+                el tipo de documento está asociado a facturas.',
                 1;
             END;
 
