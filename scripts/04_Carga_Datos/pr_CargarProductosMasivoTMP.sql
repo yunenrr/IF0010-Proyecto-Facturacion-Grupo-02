@@ -22,7 +22,13 @@ BEGIN
 
         WITH NUMEROS AS (
             SELECT TOP (@CANTIDAD)
-                ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
+                ROW_NUMBER() OVER (
+                    ORDER BY
+                        (
+                            SELECT
+                                NULL
+                        )
+                ) AS N
             FROM SYS.ALL_OBJECTS AS A
             CROSS JOIN SYS.ALL_OBJECTS AS B
         )
