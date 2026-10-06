@@ -40,9 +40,9 @@ BEGIN
         IF @@ROWCOUNT = 0
             BEGIN
                 THROW
-                    50013,
-                    'No se encontró ninguna dirección con el ID proporcionado.',
-                    1;
+                50013,
+                'No se encontró ninguna dirección con el ID proporcionado.',
+                1;
             END;
 
         COMMIT TRANSACTION;
