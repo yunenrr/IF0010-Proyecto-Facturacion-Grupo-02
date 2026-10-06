@@ -1,13 +1,20 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_ActualizarCliente' AND type = 'P')
-BEGIN
-    DROP PROCEDURE dbo.pr_ActualizarCliente;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ACTUALIZARCLIENTE'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ACTUALIZARCLIENTE;
+    END;
 GO
 
-CREATE PROCEDURE dbo.pr_ActualizarCliente
+CREATE PROCEDURE DBO.PR_ACTUALIZARCLIENTE
     @ID_CLIENTE INT,
     @ID_DIRECCION INT,
     @TELEFONO VARCHAR(15),
@@ -20,26 +27,44 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.CLIENTE WHERE ID_CLIENTE = @ID_CLIENTE)
-            THROW 50016, 'El cliente especificado no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.CLIENTE
+                WHERE ID_CLIENTE = @ID_CLIENTE
+            )
+            BEGIN
+                THROW 50016, 'El cliente especificado no existe.', 1;
+            END;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.DIRECCION WHERE ID_DIRECCION = @ID_DIRECCION)
-            THROW 50017, 'La direccion especificada no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.DIRECCION
+                WHERE ID_DIRECCION = @ID_DIRECCION
+            )
+            BEGIN
+                THROW 50017, 'La direccion especificada no existe.', 1;
+            END;
 
-        UPDATE dbo.CLIENTE
-        SET ID_DIRECCION = @ID_DIRECCION,
+        UPDATE DBO.CLIENTE
+        SET
+            ID_DIRECCION = @ID_DIRECCION,
             TELEFONO = @TELEFONO,
             CORREO = @CORREO,
             ULTIMA_ACTUALIZACION = SYSDATETIME()
-        WHERE ID_CLIENTE = @ID_CLIENTE;
+        WHERE
+            ID_CLIENTE = @ID_CLIENTE;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO

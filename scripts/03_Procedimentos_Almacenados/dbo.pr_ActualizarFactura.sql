@@ -1,0 +1,43 @@
+USE FACTURACIONSOLUCIONESMAGNIFICAS;
+GO
+
+IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_ActualizarFactura' AND type = 'P')
+BEGIN
+    DROP PROCEDURE dbo.pr_ActualizarFactura;
+END
+GO
+
+CREATE PROCEDURE dbo.pr_ActualizarFactura
+    @CODIGO_FACTURA INT,
+    @ID_ESTADO INT,
+    @OBSERVACIONES VARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF NOT EXISTS (SELECT 1 FROM dbo.FACTURA WHERE CODIGO_FACTURA = @CODIGO_FACTURA)
+            THROW 50051, 'La factura especificada no existe.', 1;
+
+        IF NOT EXISTS (SELECT 1 FROM dbo.ESTADOFACTURA WHERE ID_ESTADO = @ID_ESTADO)
+            THROW 50052, 'El estado especificado no existe.', 1;
+
+        UPDATE dbo.FACTURA
+        SET ID_ESTADO = @ID_ESTADO,
+            OBSERVACIONES = @OBSERVACIONES,
+            UPDATED_AT = SYSDATETIME()
+        WHERE CODIGO_FACTURA = @CODIGO_FACTURA;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF XACT_STATE() <> 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END
+GO
