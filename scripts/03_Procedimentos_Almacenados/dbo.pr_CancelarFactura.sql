@@ -1,13 +1,20 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'pr_CancelarFactura' AND type = 'P')
-BEGIN
-    DROP PROCEDURE dbo.pr_CancelarFactura;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_CANCELARFACTURA'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_CANCELARFACTURA;
+    END;
 GO
 
-CREATE PROCEDURE dbo.pr_CancelarFactura
+CREATE PROCEDURE DBO.PR_CANCELARFACTURA
     @CODIGO_FACTURA INT,
     @ID_ESTADO_CANCELADA INT
 AS
@@ -18,21 +25,32 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF NOT EXISTS (SELECT 1 FROM dbo.FACTURA WHERE CODIGO_FACTURA = @CODIGO_FACTURA)
-            THROW 50050, 'La factura especificada no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.FACTURA
+                WHERE CODIGO_FACTURA = @CODIGO_FACTURA
+            )
+            BEGIN
+                THROW 50050, 'La factura especificada no existe.', 1;
+            END;
 
-        UPDATE dbo.FACTURA
-        SET ID_ESTADO = @ID_ESTADO_CANCELADA,
+        UPDATE DBO.FACTURA
+        SET
+            ID_ESTADO = @ID_ESTADO_CANCELADA,
             UPDATED_AT = SYSDATETIME()
-        WHERE CODIGO_FACTURA = @CODIGO_FACTURA;
+        WHERE
+            CODIGO_FACTURA = @CODIGO_FACTURA;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO
