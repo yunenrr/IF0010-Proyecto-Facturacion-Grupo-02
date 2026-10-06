@@ -1,28 +1,31 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('dbo.pr_CargarProductosMasivoTMP', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_CargarProductosMasivoTMP;
+IF OBJECT_ID('DBO.PR_CARGARPRODUCTOSMASIVOTMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_CARGARPRODUCTOSMASIVOTMP;
 GO
 
-CREATE PROCEDURE dbo.pr_CargarProductosMasivoTMP
-    @Cantidad INT = 1000
+CREATE PROCEDURE DBO.PR_CARGARPRODUCTOSMASIVOTMP
+    @CANTIDAD INT = 1000
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @MaxCodigoActual INT;
-    SELECT @MaxCodigoActual = ISNULL(MAX(CODIGO_ID), 0) FROM dbo.PRODUCTO;
+    DECLARE @MAXCODIGOACTUAL INT;
+    SELECT @MAXCODIGOACTUAL = ISNULL(MAX(CODIGO_ID), 0)
+    FROM DBO.PRODUCTO;
 
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        WITH Numeros AS (
-            SELECT TOP (@Cantidad) 
+        WITH NUMEROS AS (
+            SELECT TOP (@CANTIDAD)
                 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
-            FROM sys.all_objects a CROSS JOIN sys.all_objects b
+            FROM SYS.ALL_OBJECTS AS A
+            CROSS JOIN SYS.ALL_OBJECTS AS B
         )
-        INSERT INTO dbo.PRODUCTO (
+
+        INSERT INTO DBO.PRODUCTO (
             CODIGO_ID,
             DESCRIPCION,
             PRECIO_UNITARIO,
@@ -31,12 +34,9 @@ BEGIN
             STOCK_MINIMO,
             ESTADO
         )
-        SELECT 
-            (@MaxCodigoActual + N) AS CODIGO_ID,
-            
+        SELECT (@MAXCODIGOACTUAL + NUMEROS.N) AS CODIGO_ID,
             CONCAT(
-                -- Producto
-                CASE (N % 13)
+                CASE (NUMEROS.N % 13)
                     WHEN 1 THEN 'Arroz'
                     WHEN 2 THEN 'Frijoles Negros'
                     WHEN 3 THEN 'Aceite Vegetal'
@@ -52,8 +52,7 @@ BEGIN
                     ELSE 'Jugo de Naranja'
                 END,
                 ' ',
-                -- Marca 
-                CASE ((N * 3) % 11)
+                CASE ((NUMEROS.N * 3) % 11)
                     WHEN 1 THEN 'Tío Pelón'
                     WHEN 2 THEN 'Don Pedro'
                     WHEN 3 THEN 'Suli'
@@ -67,8 +66,7 @@ BEGIN
                     ELSE 'Natura'
                 END,
                 ' ',
-                -- Presentación
-                CASE ((N * 5) % 7)
+                CASE ((NUMEROS.N * 5) % 7)
                     WHEN 1 THEN '1 kg'
                     WHEN 2 THEN '500 g'
                     WHEN 3 THEN '1.5 L'
@@ -78,30 +76,32 @@ BEGIN
                     ELSE 'Lata 170g'
                 END
             ) AS DESCRIPCION,
-
-            -- precio variado 
-            CAST((((N * 173) % 18500) + 450) AS DECIMAL(18,2)) AS PRECIO_UNITARIO,
+            CAST(
+                (((NUMEROS.N * 173) % 18500) + 450) AS DECIMAL(18, 2)
+            ) AS PRECIO_UNITARIO,
             13.00 AS PORCENTAJE_IMPUESTO,
-            ((N * 29) % 335) + 15 AS STOCK_ACTUAL,
+            ((NUMEROS.N * 29) % 335) + 15 AS STOCK_ACTUAL,
             10 AS STOCK_MINIMO,
-            1 AS ESTADO 
-        FROM Numeros;
+            1 AS ESTADO
+        FROM NUMEROS;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
+    END CATCH;
 END;
 GO
 
-EXEC dbo.pr_CargarProductosMasivoTMP @Cantidad = 1000;
+EXEC DBO.PR_CARGARPRODUCTOSMASIVOTMP @CANTIDAD = 1000;
 PRINT 'Carga masiva de productos completada con éxito.';
 GO
 
-IF OBJECT_ID('dbo.pr_CargarProductosMasivoTMP', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_CargarProductosMasivoTMP;
+IF OBJECT_ID('DBO.PR_CARGARPRODUCTOSMASIVOTMP', 'P') IS NOT NULL
+    DROP PROCEDURE DBO.PR_CARGARPRODUCTOSMASIVOTMP;
 GO
