@@ -3,12 +3,15 @@ GO
 
 IF
     EXISTS (
-        SELECT 1 FROM SYS.OBJECTS
-        WHERE NAME = 'pr_EliminarCliente' AND TYPE = 'P'
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ELIMINARCLIENTE'
+            AND TYPE = 'P'
     )
     BEGIN
         DROP PROCEDURE DBO.PR_ELIMINARCLIENTE;
-    END
+    END;
 GO
 
 CREATE PROCEDURE DBO.PR_ELIMINARCLIENTE
@@ -23,30 +26,40 @@ BEGIN
 
         IF
             NOT EXISTS (
-                SELECT 1 FROM DBO.CLIENTE
+                SELECT 1
+                FROM DBO.CLIENTE
                 WHERE ID_CLIENTE = @ID_CLIENTE
             )
-            THROW 50018, 'El cliente especificado no existe.', 1;
+            BEGIN
+                THROW 50018, 'El cliente especificado no existe.', 1;
+            END;
 
         IF
             EXISTS (
-                SELECT 1 FROM DBO.FACTURA
+                SELECT 1
+                FROM DBO.FACTURA
                 WHERE ID_CLIENTE = @ID_CLIENTE
             )
-            THROW 50019,
+            BEGIN
+                THROW
+                50019,
                 'No se puede eliminar: el cliente tiene facturas asociadas.',
                 1;
+            END;
 
         DELETE FROM DBO.CLIENTE
-        WHERE ID_CLIENTE = @ID_CLIENTE;
+        WHERE
+            ID_CLIENTE = @ID_CLIENTE;
 
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
-    END CATCH
-END
+    END CATCH;
+END;
 GO
