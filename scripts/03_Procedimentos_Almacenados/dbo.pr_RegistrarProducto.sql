@@ -82,6 +82,4 @@ BEGIN
         THROW;
     END CATCH
 END;
-IF OBJECT_ID('dbo.pr_RegistrarProducto', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.pr_RegistrarProducto;
 GO
