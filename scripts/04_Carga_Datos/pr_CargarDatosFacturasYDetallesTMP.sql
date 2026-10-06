@@ -1,18 +1,16 @@
-
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF
-    EXISTS (
-        SELECT 1
-        FROM SYS.OBJECTS
-        WHERE
-            NAME = 'PR_CARGARDATOSFACTURASYDETALLESTMP'
-            AND TYPE = 'P'
-    )
-    BEGIN
-        DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
-    END;
+IF EXISTS (
+    SELECT 1
+    FROM SYS.OBJECTS
+    WHERE
+        NAME = 'PR_CARGARDATOSFACTURASYDETALLESTMP'
+        AND TYPE = 'P'
+)
+BEGIN
+    DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
+END;
 GO
 
 CREATE PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP
@@ -120,12 +118,14 @@ BEGIN
                 SELECT
                     F.CODIGO_FACTURA,
                     X.NUMLINEA,
-                    ((F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000) + 1
-                        AS CODIGOPROD,
-                    ((F.CODIGO_FACTURA * 3 + X.NUMLINEA) % 5) + 1
-                        AS CANT
+                    ((F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000)
+                        + 1 AS CODIGOPROD,
+                    ((F.CODIGO_FACTURA * 3 + X.NUMLINEA) % 5)
+                        + 1 AS CANT
                 FROM #LoteFacturas AS F
-                CROSS JOIN (VALUES (1), (2), (3), (4), (5)) AS X(NUMLINEA)
+                CROSS JOIN (
+                    VALUES (1), (2), (3), (4), (5)
+                ) AS X(NUMLINEA)
                 WHERE
                     X.NUMLINEA <= 3
                     OR (
@@ -159,7 +159,8 @@ BEGIN
                 P.PRECIO_UNITARIO,
                 P.PORCENTAJE_IMPUESTO,
                 CAST(
-                    L.CANT * P.PRECIO_UNITARIO AS DECIMAL(18, 2)
+                    L.CANT * P.PRECIO_UNITARIO
+                    AS DECIMAL(18, 2)
                 ) AS SUBTOTAL_LINEA,
                 CAST(
                     L.CANT * P.PRECIO_UNITARIO
@@ -253,9 +254,9 @@ BEGIN
         END TRY
         BEGIN CATCH
             IF XACT_STATE() <> 0
-                BEGIN
-                    ROLLBACK TRANSACTION;
-                END;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
             THROW;
         END CATCH;
@@ -275,17 +276,16 @@ GO
 PRINT 'Carga masiva completada con exito.';
 GO
 
-IF
-    EXISTS (
-        SELECT 1
-        FROM SYS.OBJECTS
-        WHERE
-            NAME = 'PR_CARGARDATOSFACTURASYDETALLESTMP'
-            AND TYPE = 'P'
-    )
-    BEGIN
-        DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
-    END;
+IF EXISTS (
+    SELECT 1
+    FROM SYS.OBJECTS
+    WHERE
+        NAME = 'PR_CARGARDATOSFACTURASYDETALLESTMP'
+        AND TYPE = 'P'
+)
+BEGIN
+    DROP PROCEDURE DBO.PR_CARGARDATOSFACTURASYDETALLESTMP;
+END;
 GO
 
 PRINT 'Procedimiento temporal eliminado correctamente.';
