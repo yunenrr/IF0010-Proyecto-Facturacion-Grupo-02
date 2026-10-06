@@ -28,7 +28,8 @@ BEGIN
             NOT EXISTS (
                 SELECT 1
                 FROM DBO.PRODUCTO
-                WHERE CODIGO_ID = @CODIGO_ID
+                WHERE
+                    CODIGO_ID = @CODIGO_ID
             )
             BEGIN
                 THROW 50101, 'El producto especificado no existe.', 1;
@@ -38,13 +39,14 @@ BEGIN
             EXISTS (
                 SELECT 1
                 FROM DBO.DETALLEFACTURA
-                WHERE CODIGO_PRODUCTO = @CODIGO_ID
+                WHERE
+                    CODIGO_PRODUCTO = @CODIGO_ID
             )
             BEGIN
                 THROW
                 50102,
-                'No se puede eliminar: el producto '
-                + 'tiene detalles de factura asociados.',
+                'No se puede eliminar: el producto tiene detalles '
+                + 'de factura asociados.',
                 1;
             END;
 
