@@ -1,16 +1,17 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (
-    SELECT 1
-    FROM SYS.OBJECTS
-    WHERE
-        NAME = 'PR_CARGAREMPRESAS'
-        AND TYPE = 'P'
-)
-BEGIN
-    DROP PROCEDURE DBO.PR_CARGAREMPRESAS;
-END;
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_CARGAREMPRESAS'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_CARGAREMPRESAS;
+    END;
 GO
 
 CREATE PROCEDURE DBO.PR_CARGAREMPRESAS
@@ -20,9 +21,9 @@ BEGIN
     SET NOCOUNT ON;
 
     IF @CANTIDAD IS NULL OR @CANTIDAD <= 0
-    BEGIN
-        THROW 50001, 'La cantidad debe ser mayor a 0.', 1;
-    END;
+        BEGIN
+            THROW 50001, 'La cantidad debe ser mayor a 0.', 1;
+        END;
 
     BEGIN TRY
         BEGIN TRANSACTION;
@@ -86,11 +87,12 @@ BEGIN
             'Dirección temporal local #'
             + CAST(NUMEMPRESA AS VARCHAR) AS SENAS_ADICIONALES
         FROM #DATOSGENERADOS AS D
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM DBO.EMPRESAEMISORA AS E
-            WHERE E.CEDULA = D.CEDULAGENERADA
-        );
+        WHERE
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.EMPRESAEMISORA AS E
+                WHERE E.CEDULA = D.CEDULAGENERADA
+            );
 
         INSERT INTO DBO.EMPRESAEMISORA (
             CEDULA,
@@ -119,11 +121,12 @@ BEGIN
         INNER JOIN DBO.DIRECCION AS DIR
             ON DIR.SENAS_ADICIONALES = 'Dirección temporal local #'
             + CAST(D.NUMEMPRESA AS VARCHAR)
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM DBO.EMPRESAEMISORA AS E
-            WHERE E.CEDULA = D.CEDULAGENERADA
-        );
+        WHERE
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.EMPRESAEMISORA AS E
+                WHERE E.CEDULA = D.CEDULAGENERADA
+            );
 
         DROP TABLE #DATOSGENERADOS;
 
@@ -133,9 +136,9 @@ BEGIN
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-        BEGIN
-            ROLLBACK TRANSACTION;
-        END;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         DECLARE @ERRORMSG NVARCHAR(4000) = ERROR_MESSAGE();
 
