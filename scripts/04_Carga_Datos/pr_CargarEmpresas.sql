@@ -122,7 +122,7 @@ BEGIN
             1 AS ACTIVA
         FROM #DATOSGENERADOS AS D
         INNER JOIN DBO.DIRECCION AS DIR
-            ON DIR.SENAS_ADICIONALES = D.SENAS
+            ON D.SENAS = DIR.SENAS_ADICIONALES
         WHERE
             NOT EXISTS (
                 SELECT 1
