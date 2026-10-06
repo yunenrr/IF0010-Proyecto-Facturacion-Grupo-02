@@ -51,6 +51,7 @@ BEGIN
             FROM SECUENCIA
             WHERE NUM < @CANTIDAD
         )
+
         SELECT
             NUM,
             @ULTIMOSECUENCIAL + NUM AS NUMEMPRESA,
@@ -80,9 +81,10 @@ BEGIN
         )
         SELECT
             NOMBREPROVINCIA,
-            'Cantón ' + CAST(NUM AS VARCHAR),
-            'Distrito ' + CAST(NUM AS VARCHAR),
-            'Dirección temporal local #' + CAST(NUMEMPRESA AS VARCHAR)
+            'Cantón ' + CAST(NUM AS VARCHAR) AS CANTON,
+            'Distrito ' + CAST(NUM AS VARCHAR) AS DISTRITO,
+            'Dirección temporal local #'
+            + CAST(NUMEMPRESA AS VARCHAR) AS SENAS_ADICIONALES
         FROM #DATOSGENERADOS AS D
         WHERE NOT EXISTS (
             SELECT 1
@@ -102,16 +104,21 @@ BEGIN
         )
         SELECT
             D.CEDULAGENERADA,
-            CONCAT('Empresa Comercial ', D.NUMEMPRESA, ' S.A.'),
-            CONCAT('Corporación Soluciones ', D.NUMEMPRESA, ' S.A.'),
+            CONCAT('Empresa Comercial ', D.NUMEMPRESA, ' S.A.')
+                AS NOMBRE_COMERCIAL,
+            CONCAT('Corporación Soluciones ', D.NUMEMPRESA, ' S.A.')
+                AS RAZON_SOCIAL,
             DIR.ID_DIRECCION,
-            CONCAT('22', RIGHT('000000' + CAST(D.NUMEMPRESA AS VARCHAR), 6)),
-            CONCAT('contacto@empresa', D.NUMEMPRESA, '.com'),
-            SYSDATETIME(),
-            1
+            CONCAT('22', RIGHT('000000' + CAST(D.NUMEMPRESA AS VARCHAR), 6))
+                AS TELEFONO,
+            CONCAT('contacto@empresa', D.NUMEMPRESA, '.com')
+                AS CORREO,
+            SYSDATETIME() AS FECHA_CREACION,
+            1 AS ACTIVA
         FROM #DATOSGENERADOS AS D
         INNER JOIN DBO.DIRECCION AS DIR
-            ON DIR.SENAS_ADICIONALES = 'Dirección temporal local #' + CAST(D.NUMEMPRESA AS VARCHAR)
+            ON DIR.SENAS_ADICIONALES = 'Dirección temporal local #'
+            + CAST(D.NUMEMPRESA AS VARCHAR)
         WHERE NOT EXISTS (
             SELECT 1
             FROM DBO.EMPRESAEMISORA AS E
@@ -156,5 +163,5 @@ SELECT TOP 100
 FROM DBO.EMPRESAEMISORA AS E
 INNER JOIN DBO.DIRECCION AS D
     ON E.ID_DIRECCION = D.ID_DIRECCION
-ORDER BY E.ID_EMPRESA ASC;
+ORDER BY E.ID_EMPRESA;
 GO
