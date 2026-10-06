@@ -21,10 +21,10 @@ BEGIN
         BEGIN TRANSACTION;
 
         IF NOT EXISTS (SELECT 1 FROM dbo.CLIENTE WHERE ID_CLIENTE = @ID_CLIENTE)
-            THROW 50012, 'El cliente especificado no existe.', 1;
+            THROW 50016, 'El cliente especificado no existe.', 1;
 
         IF NOT EXISTS (SELECT 1 FROM dbo.DIRECCION WHERE ID_DIRECCION = @ID_DIRECCION)
-            THROW 50013, 'La direccion especificada no existe.', 1;
+            THROW 50017, 'La direccion especificada no existe.', 1;
 
         UPDATE dbo.CLIENTE
         SET ID_DIRECCION = @ID_DIRECCION,
