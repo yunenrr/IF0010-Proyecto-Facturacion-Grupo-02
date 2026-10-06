@@ -1,15 +1,17 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF EXISTS (
-    SELECT 1 FROM SYS.OBJECTS
-    WHERE
-        NAME = 'PR_INSERTARCLIENTE'
-        AND TYPE = 'P'
-)
-BEGIN
-    DROP PROCEDURE DBO.PR_INSERTARCLIENTE;
-END
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_INSERTARCLIENTE'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_INSERTARCLIENTE;
+    END;
 GO
 
 CREATE PROCEDURE DBO.PR_INSERTARCLIENTE
@@ -26,19 +28,27 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF EXISTS (
-            SELECT 1 FROM DBO.CLIENTE
-            WHERE
-                CEDULA_CLIENTE = @CEDULA_CLIENTE
-        )
-            THROW 50014, 'Ya existe un cliente con esta cedula.', 1;
+        IF
+            EXISTS (
+                SELECT 1
+                FROM DBO.CLIENTE
+                WHERE
+                    CEDULA_CLIENTE = @CEDULA_CLIENTE
+            )
+            BEGIN
+                THROW 50014, 'Ya existe un cliente con esta cedula.', 1;
+            END;
 
-        IF NOT EXISTS (
-            SELECT 1 FROM DBO.DIRECCION
-            WHERE
-                ID_DIRECCION = @ID_DIRECCION
-        )
-            THROW 50015, 'La direccion especificada no existe.', 1;
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.DIRECCION
+                WHERE
+                    ID_DIRECCION = @ID_DIRECCION
+            )
+            BEGIN
+                THROW 50015, 'La direccion especificada no existe.', 1;
+            END;
 
         DECLARE @NUEVOIDCLIENTE INT;
 
@@ -66,9 +76,11 @@ BEGIN
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
 
         THROW;
     END CATCH
-END
+END;
 GO
