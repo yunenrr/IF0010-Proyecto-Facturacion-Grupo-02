@@ -74,7 +74,6 @@ BEGIN
                 CROSS JOIN SYS.ALL_OBJECTS AS B
             ),
 
->>>>>>> Stashed changes
             DATOSCALCULADOS AS (
                 SELECT
                     (
