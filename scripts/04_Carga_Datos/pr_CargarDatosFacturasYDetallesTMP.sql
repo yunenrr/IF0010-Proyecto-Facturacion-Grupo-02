@@ -18,7 +18,9 @@ BEGIN
     DECLARE @MaxCodigoActual INT;
 
     SELECT
-        @MaxCodigoActual = ISNULL(MAX(F.CODIGO_FACTURA), 0)
+        @MaxCodigoActual = ISNULL(
+            MAX(F.CODIGO_FACTURA), 0
+        )
     FROM DBO.FACTURA AS F;
 
     -- Tablas temporales de apoyo
