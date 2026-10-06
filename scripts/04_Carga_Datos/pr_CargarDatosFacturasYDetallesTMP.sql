@@ -68,6 +68,7 @@ BEGIN
                 FROM SYS.ALL_OBJECTS AS A
                 CROSS JOIN SYS.ALL_OBJECTS AS B
             ),
+
             DATOSCALCULADOS AS (
                 SELECT
                     (
@@ -90,6 +91,7 @@ BEGIN
                     ) AS FECHA_EMISION
                 FROM NUMEROS
             )
+
             INSERT INTO #LoteFacturas (
                 CODIGO_FACTURA,
                 ID_EMPRESA,
