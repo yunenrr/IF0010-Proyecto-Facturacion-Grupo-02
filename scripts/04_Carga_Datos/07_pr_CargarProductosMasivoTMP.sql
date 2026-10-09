@@ -30,8 +30,7 @@ BEGIN
         BEGIN TRANSACTION;
 
         WITH NUMEROS AS (
-            SELECT TOP (@CANTIDAD)
-                ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS N
+            SELECT TOP (@CANTIDAD) ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS N
             FROM SYS.ALL_OBJECTS AS A
             CROSS JOIN SYS.ALL_OBJECTS AS B
         )
@@ -45,7 +44,7 @@ BEGIN
             STOCK_MINIMO,
             ESTADO
         )
-        SELECT 
+        SELECT
             (@MAXCODIGOACTUAL + NUMEROS.N) AS CODIGO_ID,
             CONCAT(
                 CASE (NUMEROS.N % 13)
