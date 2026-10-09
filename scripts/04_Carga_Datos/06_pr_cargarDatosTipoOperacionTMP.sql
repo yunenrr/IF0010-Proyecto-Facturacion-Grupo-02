@@ -32,9 +32,9 @@ BEGIN
             T.DESCRIPCION
         FROM (
             VALUES
-                (1, 'INSERT'),
-                (2, 'UPDATE'),
-                (3, 'DELETE')
+            (1, 'INSERT'),
+            (2, 'UPDATE'),
+            (3, 'DELETE')
         ) AS T(ID_OPERACION, DESCRIPCION)
         WHERE
             NOT EXISTS (
