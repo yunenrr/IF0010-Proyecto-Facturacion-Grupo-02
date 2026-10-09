@@ -205,7 +205,8 @@ BEGIN
                     FECHA_EMISION,
                     SUBTOTAL,
                     TOTAL_IMPUESTOS,
-                    MONTO_TOTAL
+                    MONTO_TOTAL,
+                    OBSERVACIONES
                 )
                 SELECT
                     CODIGO_FACTURA,
@@ -218,7 +219,8 @@ BEGIN
                     FECHA_EMISION,
                     SUBTOTAL,
                     TOTAL_IMPUESTOS,
-                    MONTO_TOTAL
+                    MONTO_TOTAL,
+                    'N/A' AS OBSERVACIONES
                 FROM #LoteFacturas;
 
                 INSERT INTO DBO.DETALLEFACTURA (
