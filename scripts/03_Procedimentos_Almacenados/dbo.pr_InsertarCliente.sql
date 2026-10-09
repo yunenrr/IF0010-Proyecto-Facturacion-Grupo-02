@@ -15,7 +15,7 @@ IF
 GO
 
 CREATE PROCEDURE DBO.PR_INSERTARCLIENTE
-    @CEDULA VARCHAR(20),
+    @CEDULA_CLIENTE VARCHAR(20),
     @NOMBRE VARCHAR(70),
     @ID_DIRECCION INT,
     @TELEFONO VARCHAR(15),
@@ -32,10 +32,10 @@ BEGIN
             EXISTS (
                 SELECT 1
                 FROM DBO.CLIENTE
-                WHERE CEDULA = @CEDULA
+                WHERE CEDULA_CLIENTE = @CEDULA_CLIENTE
             )
             BEGIN
-                THROW 50003, 'Ya existe un cliente con esta cedula.', 1;
+                THROW 50014, 'Ya existe un cliente con esta cedula.', 1;
             END;
 
         IF
@@ -45,18 +45,25 @@ BEGIN
                 WHERE ID_DIRECCION = @ID_DIRECCION
             )
             BEGIN
-                THROW 50001, 'La direccion especificada no existe.', 1;
+                THROW 50015, 'La direccion especificada no existe.', 1;
             END;
 
+        DECLARE @NUEVOIDCLIENTE INT;
+
+        SELECT @NUEVOIDCLIENTE = ISNULL(MAX(ID_CLIENTE), 0) + 1
+        FROM DBO.CLIENTE;
+
         INSERT INTO DBO.CLIENTE (
-            CEDULA,
+            ID_CLIENTE,
+            CEDULA_CLIENTE,
             NOMBRE,
             ID_DIRECCION,
             TELEFONO,
             CORREO
         )
         VALUES (
-            @CEDULA,
+            @NUEVOIDCLIENTE,
+            @CEDULA_CLIENTE,
             @NOMBRE,
             @ID_DIRECCION,
             @TELEFONO,
