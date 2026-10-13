@@ -88,7 +88,7 @@ BEGIN
                         AS CODIGO_FACTURA,
                     ((N.N * 17) % 100) + 1 AS ID_EMPRESA,
                     ((N.N * 31) % 50000) + 1 AS ID_CLIENTE,
-                    TD.ID_TIPO_DOCUMENTO AS ID_TIPO_DOCUMENTO,
+                    TD.ID_TIPO_DOCUMENTO,
                     CASE
                         WHEN (N.N % 2) = 0 THEN 'CRC'
                         ELSE 'USD'
@@ -173,19 +173,19 @@ BEGIN
                     L.CANT,
                     P.PRECIO_UNITARIO,
                     P.PORCENTAJE_IMPUESTO,
-                    CAST(
+                    CONVERT(
+                        DECIMAL(18, 2),
                         L.CANT * P.PRECIO_UNITARIO
-                        AS DECIMAL(18, 2)
                     ) AS SUBTOTAL_LINEA,
-                    CAST(
+                    CONVERT(
+                        DECIMAL(18, 2),
                         L.CANT * P.PRECIO_UNITARIO
                         * P.PORCENTAJE_IMPUESTO / 100.00
-                        AS DECIMAL(18, 2)
                     ) AS MONTO_IMPUESTO,
-                    CAST(
+                    CONVERT(
+                        DECIMAL(18, 2),
                         L.CANT * P.PRECIO_UNITARIO
                         * (1 + P.PORCENTAJE_IMPUESTO / 100.00)
-                        AS DECIMAL(18, 2)
                     ) AS MONTO_TOTAL_LINEA
                 FROM LINEAS AS L
                 INNER JOIN DBO.PRODUCTO AS P
