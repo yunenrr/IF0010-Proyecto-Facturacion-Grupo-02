@@ -102,10 +102,34 @@ BEGIN
                 THROW 50058, 'El estado especificado no existe.', 1;
             END;
 
-        DECLARE @NUEVO_CODIGO INT = (
-            SELECT ISNULL(MAX(CODIGO_FACTURA), 0) + 1
-            FROM DBO.FACTURA
-        );
+        DECLARE @DESCRIPCIONTIPO VARCHAR(50);
+
+        SELECT @DESCRIPCIONTIPO = DESCRIPCION_TIPO_DOCUMENTO
+        FROM DBO.TIPODOCUMENTO
+        WHERE ID_TIPO_DOCUMENTO = @ID_TIPO_DOCUMENTO;
+
+        IF
+            LEN(@IDENTIFICADOR_COMPROBANTE)
+            <> 15 + LEN(@DESCRIPCIONTIPO)
+            OR TRY_CAST(
+                LEFT(@IDENTIFICADOR_COMPROBANTE, 14) AS BIGINT
+            ) IS NULL
+            OR SUBSTRING(@IDENTIFICADOR_COMPROBANTE, 15, 1) <> '-'
+            OR RIGHT(
+                @IDENTIFICADOR_COMPROBANTE,
+                LEN(@DESCRIPCIONTIPO)
+            ) <> @DESCRIPCIONTIPO
+            BEGIN
+                THROW
+                50059,
+                'El formato del identificador es incorrecto.',
+                1;
+            END;
+
+        DECLARE @NUEVO_CODIGO INT;
+
+        SELECT @NUEVO_CODIGO = ISNULL(MAX(CODIGO_FACTURA), 0) + 1
+        FROM DBO.FACTURA;
 
         INSERT INTO DBO.FACTURA (
             CODIGO_FACTURA,

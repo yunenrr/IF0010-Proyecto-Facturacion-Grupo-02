@@ -88,30 +88,46 @@ BEGIN
                         AS CODIGO_FACTURA,
                     ((N.N * 17) % 100) + 1 AS ID_EMPRESA,
                     ((N.N * 31) % 50000) + 1 AS ID_CLIENTE,
-                    ((N.N % 4) + 1) AS ID_TIPO_DOCUMENTO,
+                    TD.ID_TIPO_DOCUMENTO AS ID_TIPO_DOCUMENTO,
                     CASE
                         WHEN (N.N % 2) = 0 THEN 'CRC'
                         ELSE 'USD'
                     END AS CODIGO_DIVISA,
                     ((N.N % 4) + 1) AS ID_ESTADO,
                     CONCAT(
-                        FORMAT(
+                        CONVERT(
+                            VARCHAR(8),
                             DATEADD(
                                 SECOND,
                                 (N.N + @FacturasProcesadas) * 60,
                                 @FechaInicio
                             ),
-                            'yyyyMMddHHmmss'
+                            112
+                        ),
+                        REPLACE(
+                            CONVERT(
+                                VARCHAR(8),
+                                DATEADD(
+                                    SECOND,
+                                    (N.N + @FacturasProcesadas) * 60,
+                                    @FechaInicio
+                                ),
+                                108
+                            ),
+                            ':',
+                            ''
                         ),
                         '-',
-                        ((N.N % 4) + 1)
+                        TD.DESCRIPCION_TIPO_DOCUMENTO
                     ) AS IDENTIFICADOR_COMPROBANTE,
                     DATEADD(
                         SECOND,
                         (N.N + @FacturasProcesadas) * 60,
                         @FechaInicio
                     ) AS FECHA_EMISION
-                FROM #Numeros AS N;
+                FROM #Numeros AS N
+                INNER JOIN DBO.TIPODOCUMENTO AS TD
+                    ON ((N.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO;
 
                 WITH LINEAS AS (
                     SELECT

@@ -32,10 +32,10 @@ BEGIN
             T.DESCRIPCION_TIPO_DOCUMENTO
         FROM (
             VALUES
-            (1, 'Factura Electrónica'),
-            (2, 'Tiquete Electrónico'),
-            (3, 'Nota de Débito'),
-            (4, 'Nota de Crédito')
+            (1, 'FACTURA'),
+            (2, 'TIQUETE'),
+            (3, 'NOTADEBITO'),
+            (4, 'NOTACREDITO')
         ) AS T(ID_TIPO_DOCUMENTO, DESCRIPCION_TIPO_DOCUMENTO)
         WHERE
             NOT EXISTS (
