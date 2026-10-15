@@ -1,0 +1,61 @@
+USE FACTURACIONSOLUCIONESMAGNIFICAS;
+GO
+
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_CARGARDATOSTIPOOPERACIONTMP'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_CARGARDATOSTIPOOPERACIONTMP;
+    END;
+GO
+
+CREATE PROCEDURE DBO.PR_CARGARDATOSTIPOOPERACIONTMP
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        INSERT INTO DBO.TIPO_OPERACION (
+            ID_OPERACION,
+            DESCRIPCION
+        )
+        SELECT
+            T.ID_OPERACION,
+            T.DESCRIPCION
+        FROM (
+            VALUES
+            (1, 'INSERT'),
+            (2, 'UPDATE'),
+            (3, 'DELETE')
+        ) AS T(ID_OPERACION, DESCRIPCION)
+        WHERE
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.TIPO_OPERACION AS TO2
+                WHERE TO2.ID_OPERACION = T.ID_OPERACION
+            );
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF XACT_STATE() <> 0
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
+
+        THROW;
+    END CATCH;
+END;
+GO
+
+EXEC DBO.PR_CARGARDATOSTIPOOPERACIONTMP;
+PRINT 'si se cargo';
+GO
