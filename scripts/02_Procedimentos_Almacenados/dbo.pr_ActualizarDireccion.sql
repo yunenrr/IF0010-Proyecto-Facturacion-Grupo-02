@@ -14,35 +14,38 @@ IF
     END;
 GO
 
-CREATE PROCEDURE DBO.PR_ACTUALIZARDIRECCION (
-    @DIRECCIONID INT,
-    @PROVINCIA VARCHAR(50),
-    @CANTON VARCHAR(50),
-    @DISTRITO VARCHAR(50),
-    @SENASADICIONALES VARCHAR(250) = NULL
-)
+CREATE PROCEDURE DBO.PR_ACTUALIZARDIRECCION
+    @IDDIRECCION INT,
+    @IDDISTRITO INT,
+    @SENASADICIONALES VARCHAR(250)
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     BEGIN TRY
         BEGIN TRANSACTION;
 
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.DISTRITO
+                WHERE ID_DISTRITO = @IDDISTRITO
+            )
+            BEGIN
+                THROW 50034, 'El distrito especificado no existe.', 1;
+            END;
+
         UPDATE DBO.DIRECCION
         SET
-            PROVINCIA = @PROVINCIA,
-            CANTON = @CANTON,
-            DISTRITO = @DISTRITO,
+            ID_DISTRITO = @IDDISTRITO,
             SENAS_ADICIONALES = @SENASADICIONALES
         WHERE
-            ID_DIRECCION = @DIRECCIONID;
+            ID_DIRECCION = @IDDIRECCION;
 
         IF @@ROWCOUNT = 0
             BEGIN
-                THROW
-                50013,
-                'No se encontró ninguna dirección con el ID proporcionado.',
-                1;
+                THROW 50035, 'La direccion especificada no existe.', 1;
             END;
 
         COMMIT TRANSACTION;
