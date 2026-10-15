@@ -102,57 +102,6 @@ BEGIN
         ('icloud.com'),
         ('empresa.cr');
 
-        CREATE TABLE #CANTONES (CANTON VARCHAR(50));
-        INSERT INTO #CANTONES (CANTON)
-        VALUES
-        ('Central'),
-        ('Escazú'),
-        ('Desamparados'),
-        ('Puriscal'),
-        ('Tarrazú'),
-        ('Aserrí'),
-        ('Mora'),
-        ('Goicoechea'),
-        ('Santa Ana'),
-        ('Alajuelita'),
-        ('Vázquez de Coronado'),
-        ('Tibás'),
-        ('Moravia'),
-        ('Montes de Oca'),
-        ('Turrialba'),
-        ('San Ramón'),
-        ('Grecia'),
-        ('Atenas'),
-        ('Naranjo'),
-        ('Palmares'),
-        ('Poás'),
-        ('San Carlos'),
-        ('Pérez Zeledón');
-
-        CREATE TABLE #DISTRITOS (DISTRITO VARCHAR(50));
-        INSERT INTO #DISTRITOS (DISTRITO)
-        VALUES
-        ('Carmen'),
-        ('Merced'),
-        ('Hospital'),
-        ('Catedral'),
-        ('Zapote'),
-        ('San Francisco de Dos Ríos'),
-        ('Uruca'),
-        ('Mata Redonda'),
-        ('Pavas'),
-        ('Hatillo'),
-        ('San Sebastián'),
-        ('San Rafael'),
-        ('San Antonio'),
-        ('Guadalupe'),
-        ('San Pedro'),
-        ('Curridabat'),
-        ('San Juan'),
-        ('San Isidro'),
-        ('Quesada'),
-        ('San José');
-
         CREATE TABLE #SENAS (SENA VARCHAR(100));
         INSERT INTO #SENAS (SENA)
         VALUES
@@ -169,9 +118,18 @@ BEGIN
         SELECT @BASECONTADOR = ISNULL(MAX(ID_CLIENTE), 0)
         FROM DBO.CLIENTE;
 
+        DECLARE @TOTALDISTRITOS INT;
+        SELECT @TOTALDISTRITOS = COUNT(*)
+        FROM DBO.DISTRITO;
+
+        IF @TOTALDISTRITOS = 0
+            BEGIN
+                THROW 50036, 'No hay distritos cargados.', 1;
+            END;
+
         DECLARE @I INT = 1;
         DECLARE @NUEVOIDDIRECCION INT;
-        DECLARE @PROVINCIA VARCHAR(50);
+        DECLARE @IDDISTRITO INT;
         DECLARE @CODIGOPROVINCIA INT;
         DECLARE @FILASINSERTADAS INT = 0;
         DECLARE @NOMBREALEATORIO VARCHAR(70);
@@ -181,8 +139,6 @@ BEGIN
         DECLARE @APE2TEMP VARCHAR(30);
         DECLARE @DOMTEMP VARCHAR(20);
         DECLARE @CEDULAPROVINCIAL VARCHAR(20);
-        DECLARE @CANTONTEMP VARCHAR(50);
-        DECLARE @DISTRITOTEMP VARCHAR(50);
         DECLARE @SENATEMP VARCHAR(100);
         DECLARE @NUEVOIDCLIENTE INT;
 
@@ -199,23 +155,7 @@ BEGIN
         WHILE @I <= @CANTIDAD
             BEGIN
                 SET @CODIGOPROVINCIA = ((@I - 1) % 7) + 1;
-                SET @PROVINCIA = CASE @CODIGOPROVINCIA
-                    WHEN 1 THEN 'San José'
-                    WHEN 2 THEN 'Alajuela'
-                    WHEN 3 THEN 'Cartago'
-                    WHEN 4 THEN 'Heredia'
-                    WHEN 5 THEN 'Guanacaste'
-                    WHEN 6 THEN 'Puntarenas'
-                    ELSE 'Limón'
-                END;
-
-                SELECT TOP 1 @CANTONTEMP = CANTON
-                FROM #CANTONES
-                ORDER BY NEWID();
-
-                SELECT TOP 1 @DISTRITOTEMP = DISTRITO
-                FROM #DISTRITOS
-                ORDER BY NEWID();
+                SET @IDDISTRITO = ((@I * 7) % @TOTALDISTRITOS) + 1;
 
                 SELECT TOP 1 @SENATEMP = SENA
                 FROM #SENAS
@@ -231,15 +171,11 @@ BEGIN
                     END;
 
                 INSERT INTO DBO.DIRECCION (
-                    PROVINCIA,
-                    CANTON,
-                    DISTRITO,
+                    ID_DISTRITO,
                     SENAS_ADICIONALES
                 )
                 VALUES (
-                    @PROVINCIA,
-                    ISNULL(@CANTONTEMP, 'Central'),
-                    ISNULL(@DISTRITOTEMP, 'San José'),
+                    @IDDISTRITO,
                     ISNULL(@SENATEMP, 'Sin señas adicionales')
                 );
 
@@ -349,8 +285,6 @@ BEGIN
         DROP TABLE #NOMBRES;
         DROP TABLE #APELLIDOS;
         DROP TABLE #DOMINIOS;
-        DROP TABLE #CANTONES;
-        DROP TABLE #DISTRITOS;
         DROP TABLE #SENAS;
         DROP TABLE #CLIENTESINSERTADOS;
     END TRY
