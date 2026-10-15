@@ -20,8 +20,7 @@ CREATE PROCEDURE DBO.PR_REGISTRARFACTURA
     @ID_CLIENTE INT,
     @ID_TIPO_DOCUMENTO INT,
     @CODIGO_DIVISA CHAR(3),
-    @ID_ESTADO INT,
-    @OBSERVACIONES VARCHAR(255)
+    @ID_ESTADO INT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -138,8 +137,7 @@ BEGIN
             ID_CLIENTE,
             ID_TIPO_DOCUMENTO,
             CODIGO_DIVISA,
-            ID_ESTADO,
-            OBSERVACIONES
+            ID_ESTADO
         )
         VALUES (
             @NUEVO_CODIGO,
@@ -148,8 +146,7 @@ BEGIN
             @ID_CLIENTE,
             @ID_TIPO_DOCUMENTO,
             @CODIGO_DIVISA,
-            @ID_ESTADO,
-            @OBSERVACIONES
+            @ID_ESTADO
         );
 
         COMMIT TRANSACTION;
