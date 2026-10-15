@@ -1,33 +1,47 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('DBO.PR_REGISTRARDIRECCION', 'P') IS NOT NULL
-    DROP PROCEDURE DBO.PR_REGISTRARDIRECCION;
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_REGISTRARDIRECCION'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_REGISTRARDIRECCION;
+    END;
 GO
 
 CREATE PROCEDURE DBO.PR_REGISTRARDIRECCION
-    @PROVINCIA VARCHAR(50),
-    @CANTON VARCHAR(50),
-    @DISTRITO VARCHAR(50),
+    @IDDISTRITO INT,
     @SENASADICIONALES VARCHAR(250),
     @IDDIRECCION INT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     BEGIN TRY
         BEGIN TRANSACTION;
 
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.DISTRITO
+                WHERE ID_DISTRITO = @IDDISTRITO
+            )
+            BEGIN
+                THROW 50034, 'El distrito especificado no existe.', 1;
+            END;
+
         INSERT INTO DBO.DIRECCION (
-            PROVINCIA,
-            CANTON,
-            DISTRITO,
+            ID_DISTRITO,
             SENAS_ADICIONALES
         )
         VALUES (
-            @PROVINCIA,
-            @CANTON,
-            @DISTRITO,
+            @IDDISTRITO,
             @SENASADICIONALES
         );
 
