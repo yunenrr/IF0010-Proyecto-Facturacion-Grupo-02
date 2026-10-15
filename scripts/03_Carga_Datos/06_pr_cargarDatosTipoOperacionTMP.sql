@@ -23,13 +23,18 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        INSERT INTO DBO.TIPO_OPERACION (ID_OPERACION, DESCRIPCION)
-        SELECT T.ID_OPERACION, T.DESCRIPCION
+        INSERT INTO DBO.TIPO_OPERACION (
+            ID_OPERACION,
+            DESCRIPCION
+        )
+        SELECT
+            T.ID_OPERACION,
+            T.DESCRIPCION
         FROM (
             VALUES
-                (1, 'INSERT'),
-                (2, 'UPDATE'),
-                (3, 'DELETE')
+            (1, 'INSERT'),
+            (2, 'UPDATE'),
+            (3, 'DELETE')
         ) AS T(ID_OPERACION, DESCRIPCION)
         WHERE
             NOT EXISTS (
