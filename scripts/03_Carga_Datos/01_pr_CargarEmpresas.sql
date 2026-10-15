@@ -19,6 +19,7 @@ CREATE PROCEDURE DBO.PR_CARGAREMPRESAS
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     IF @CANTIDAD IS NULL OR @CANTIDAD <= 0
         BEGIN
@@ -29,6 +30,15 @@ BEGIN
         BEGIN TRANSACTION;
 
         DECLARE @ULTIMOSECUENCIAL INT = 0;
+        DECLARE @TOTALDISTRITOS INT;
+
+        SELECT @TOTALDISTRITOS = COUNT(*)
+        FROM DBO.DISTRITO;
+
+        IF @TOTALDISTRITOS = 0
+            BEGIN
+                THROW 50036, 'No hay distritos cargados.', 1;
+            END;
 
         SELECT
             @ULTIMOSECUENCIAL = ISNULL(
@@ -56,16 +66,6 @@ BEGIN
         SELECT
             NUM,
             @ULTIMOSECUENCIAL + NUM AS NUMEMPRESA,
-            ((NUM - 1) % 7) + 1 AS CODIGOPROVINCIA,
-            CASE ((NUM - 1) % 7) + 1
-                WHEN 1 THEN 'San José'
-                WHEN 2 THEN 'Alajuela'
-                WHEN 3 THEN 'Cartago'
-                WHEN 4 THEN 'Heredia'
-                WHEN 5 THEN 'Guanacaste'
-                WHEN 6 THEN 'Puntarenas'
-                ELSE 'Limón'
-            END AS NOMBREPROVINCIA,
             CONCAT(
                 '3-101-',
                 RIGHT('000000' + CAST(@ULTIMOSECUENCIAL + NUM AS VARCHAR), 6)
@@ -79,15 +79,11 @@ BEGIN
         OPTION (MAXRECURSION 32767);
 
         INSERT INTO DBO.DIRECCION (
-            PROVINCIA,
-            CANTON,
-            DISTRITO,
+            ID_DISTRITO,
             SENAS_ADICIONALES
         )
         SELECT
-            D.NOMBREPROVINCIA,
-            'Cantón ' + CAST(D.NUM AS VARCHAR) AS CANTON,
-            'Distrito ' + CAST(D.NUM AS VARCHAR) AS DISTRITO,
+            ((D.NUM * 7) % @TOTALDISTRITOS) + 1 AS ID_DISTRITO,
             D.SENAS AS SENAS_ADICIONALES
         FROM #DATOSGENERADOS AS D
         WHERE
@@ -159,14 +155,20 @@ SELECT TOP 100
     E.RAZON_SOCIAL,
     E.TELEFONO,
     E.CORREO,
-    D.PROVINCIA,
-    D.CANTON,
-    D.DISTRITO,
+    DI.NOMBRE AS DISTRITO,
+    C.NOMBRE AS CANTON,
+    P.NOMBRE AS PROVINCIA,
     D.SENAS_ADICIONALES,
     E.FECHA_CREACION,
     E.ACTIVA
 FROM DBO.EMPRESAEMISORA AS E
 INNER JOIN DBO.DIRECCION AS D
     ON E.ID_DIRECCION = D.ID_DIRECCION
+INNER JOIN DBO.DISTRITO AS DI
+    ON D.ID_DISTRITO = DI.ID_DISTRITO
+INNER JOIN DBO.CANTON AS C
+    ON DI.ID_CANTON = C.ID_CANTON
+INNER JOIN DBO.PROVINCIA AS P
+    ON C.ID_PROVINCIA = P.ID_PROVINCIA
 ORDER BY E.ID_EMPRESA;
 GO
