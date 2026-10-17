@@ -94,40 +94,22 @@ BEGIN
                         ELSE 'USD'
                     END AS CODIGO_DIVISA,
                     ((N.N % 4) + 1) AS ID_ESTADO,
-                    CONCAT(
-                        CONVERT(
-                            VARCHAR(8),
-                            DATEADD(
-                                SECOND,
-                                (N.N + @FacturasProcesadas) * 60,
-                                @FechaInicio
-                            ),
-                            112
-                        ),
-                        REPLACE(
-                            CONVERT(
-                                VARCHAR(8),
-                                DATEADD(
-                                    SECOND,
-                                    (N.N + @FacturasProcesadas) * 60,
-                                    @FechaInicio
-                                ),
-                                108
-                            ),
-                            ':',
-                            ''
-                        ),
-                        '-',
-                        TD.DESCRIPCION_TIPO_DOCUMENTO
+                    DBO.FN_GENERARCLAVECOMPROBANTE(
+                        FE.FECHA,
+                        TD.ID_TIPO_DOCUMENTO
                     ) AS IDENTIFICADOR_COMPROBANTE,
-                    DATEADD(
-                        SECOND,
-                        (N.N + @FacturasProcesadas) * 60,
-                        @FechaInicio
-                    ) AS FECHA_EMISION
+                    FE.FECHA AS FECHA_EMISION
                 FROM #Numeros AS N
                 INNER JOIN DBO.TIPODOCUMENTO AS TD
-                    ON ((N.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO;
+                    ON ((N.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO
+                CROSS APPLY (
+                    SELECT
+                        DATEADD(
+                            SECOND,
+                            (N.N + @FacturasProcesadas) * 60,
+                            @FechaInicio
+                        ) AS FECHA
+                ) AS FE;
 
                 WITH LINEAS AS (
                     SELECT
@@ -303,5 +285,5 @@ IF
     END;
 GO
 
-PRINT 'Procedimiento temporal eliminado correctamente.';
+PRINT 'Procedimiento eliminado correctamente.';
 GO
