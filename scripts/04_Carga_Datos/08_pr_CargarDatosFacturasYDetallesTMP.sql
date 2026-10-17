@@ -76,6 +76,17 @@ BEGIN
                 TRUNCATE TABLE #LoteFacturas;
                 TRUNCATE TABLE #LoteDetalles;
 
+                WITH FECHAS AS (
+                    SELECT
+                        N.N,
+                        DATEADD(
+                            SECOND,
+                            (N.N + @FacturasProcesadas) * 60,
+                            @FechaInicio
+                        ) AS FECHA
+                    FROM #Numeros AS N
+                )
+
                 INSERT INTO #LoteFacturas (
                     CODIGO_FACTURA,
                     ID_EMPRESA,
@@ -87,32 +98,24 @@ BEGIN
                     FECHA_EMISION
                 )
                 SELECT
-                    @MaxCodigoActual + @FacturasProcesadas + N.N
+                    @MaxCodigoActual + @FacturasProcesadas + FE.N
                         AS CODIGO_FACTURA,
-                    ((N.N * 17) % 100) + 1 AS ID_EMPRESA,
-                    ((N.N * 31) % 50000) + 1 AS ID_CLIENTE,
+                    ((FE.N * 17) % 100) + 1 AS ID_EMPRESA,
+                    ((FE.N * 31) % 50000) + 1 AS ID_CLIENTE,
                     TD.ID_TIPO_DOCUMENTO,
                     CASE
-                        WHEN (N.N % 2) = 0 THEN 'CRC'
+                        WHEN (FE.N % 2) = 0 THEN 'CRC'
                         ELSE 'USD'
                     END AS CODIGO_DIVISA,
-                    ((N.N % 4) + 1) AS ID_ESTADO,
+                    ((FE.N % 4) + 1) AS ID_ESTADO,
                     DBO.FN_GENERARCLAVECOMPROBANTE(
                         FE.FECHA,
                         TD.ID_TIPO_DOCUMENTO
                     ) AS IDENTIFICADOR_COMPROBANTE,
                     FE.FECHA AS FECHA_EMISION
-                FROM #Numeros AS N
+                FROM FECHAS AS FE
                 INNER JOIN DBO.TIPODOCUMENTO AS TD
-                    ON ((N.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO
-                CROSS APPLY (
-                    SELECT
-                        DATEADD(
-                            SECOND,
-                            (N.N + @FacturasProcesadas) * 60,
-                            @FechaInicio
-                        ) AS FECHA
-                ) AS FE;
+                    ON ((FE.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO;
 
                 WITH LINEAS AS (
                     SELECT
