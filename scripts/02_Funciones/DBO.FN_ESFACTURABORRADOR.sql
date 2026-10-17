@@ -28,13 +28,13 @@ BEGIN
     WHERE IDENTIFICADOR_COMPROBANTE = @IDENTIFICADORCOMPROBANTE;
 
     IF @IDESTADO = 1
-    BEGIN
-        SET @ESBORRADOR = 1
-    END
+        BEGIN
+            SET @ESBORRADOR = 1
+        END
     ELSE
-    BEGIN
-        SET @ESBORRADOR = 0;
-    END;
+        BEGIN
+            SET @ESBORRADOR = 0;
+        END;
 
     RETURN @ESBORRADOR;
 END;
