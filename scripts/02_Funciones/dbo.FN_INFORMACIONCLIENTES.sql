@@ -9,9 +9,9 @@ IF
             NAME = N'Administrativo'
             AND TYPE = 'R'
     )
-BEGIN
-    CREATE ROLE [Administrativo] AUTHORIZATION DBO;
-END;
+    BEGIN
+        CREATE ROLE [Administrativo] AUTHORIZATION DBO;
+    END;
 GO
 
 IF
@@ -22,9 +22,9 @@ IF
             NAME = N'Cajero'
             AND TYPE = 'R'
     )
-BEGIN
-    CREATE ROLE [Cajero] AUTHORIZATION DBO;
-END;
+    BEGIN
+        CREATE ROLE [Cajero] AUTHORIZATION DBO;
+    END;
 GO
 
 IF
@@ -35,25 +35,25 @@ IF
             NAME = N'Consulta'
             AND TYPE = 'R'
     )
-BEGIN
-    CREATE ROLE [Consulta] AUTHORIZATION DBO;
-END;
+    BEGIN
+        CREATE ROLE [Consulta] AUTHORIZATION DBO;
+    END;
 GO
 
 IF USER_ID(N'UsuarioCajero') IS NULL
-BEGIN
-    CREATE USER [UsuarioCajero] WITHOUT LOGIN;
-END;
+    BEGIN
+        CREATE USER [UsuarioCajero] WITHOUT LOGIN;
+    END;
 
 IF USER_ID(N'UsuarioAdministrador') IS NULL
-BEGIN
-    CREATE USER [UsuarioAdministrador] WITHOUT LOGIN;
-END;
+    BEGIN
+        CREATE USER [UsuarioAdministrador] WITHOUT LOGIN;
+    END;
 
 IF USER_ID(N'UsuarioSinRol') IS NULL
-BEGIN
-    CREATE USER [UsuarioSinRol] WITHOUT LOGIN;
-END;
+    BEGIN
+        CREATE USER [UsuarioSinRol] WITHOUT LOGIN;
+    END;
 GO
 
 ALTER ROLE [Cajero] ADD MEMBER [UsuarioCajero];
@@ -62,9 +62,9 @@ ALTER ROLE [Administrativo] ADD MEMBER [UsuarioAdministrador];
 GO
 
 IF OBJECT_ID('DBO.FN_INFORMACIONCLIENTES', 'IF') IS NOT NULL
-BEGIN
-    DROP FUNCTION DBO.FN_INFORMACIONCLIENTES;
-END;
+    BEGIN
+        DROP FUNCTION DBO.FN_INFORMACIONCLIENTES;
+    END;
 GO
 
 CREATE FUNCTION DBO.FN_INFORMACIONCLIENTES()
