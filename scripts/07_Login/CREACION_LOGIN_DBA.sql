@@ -11,11 +11,11 @@ IF TRIM(@CLAVEDBA) = ''
 IF
     EXISTS (
         SELECT 1
-        FROM SYS.SERVER_PRINCIPALS
+        FROM sys.server_principals
         WHERE
-            NAME = N'LOGDBA'
+            name = N'LOGDBA'
     )
-        THROW 51007, 'Ya existe el login LOGDBA; no se sobreescribe', 1;
+    THROW 51007, 'Ya existe el login LOGDBA; no se sobreescribe', 1;
 
 DECLARE @COMANDO NVARCHAR(MAX);
 SET @COMANDO = N'CREATE LOGIN LOGDBA WITH PASSWORD = '

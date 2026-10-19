@@ -11,11 +11,11 @@ IF TRIM(@CLAVEAUDITOR) = ''
 IF
     EXISTS (
         SELECT 1
-        FROM SYS.SERVER_PRINCIPALS
+        FROM sys.server_principals
         WHERE
-            NAME = N'LOGAUDITOR'
+            name = N'LOGAUDITOR'
     )
-        THROW 51007, 'Ya existe el login LOGAUDITOR; no se sobreescribe', 1;
+    THROW 51007, 'Ya existe el login LOGAUDITOR; no se sobreescribe', 1;
 
 DECLARE @COMANDO NVARCHAR(MAX);
 SET @COMANDO = N'CREATE LOGIN LOGAUDITOR WITH PASSWORD = '
