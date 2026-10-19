@@ -4,16 +4,16 @@ GO
 IF
     NOT EXISTS (
         SELECT 1
-        FROM sys.database_role_members rm
-        JOIN
-            sys.database_principals r ON rm.role_principal_id = r.principal_id
-        JOIN
-            sys.database_principals u ON rm.member_principal_id = u.principal_id
+        FROM SYS.DATABASE_ROLE_MEMBERS AS RM
+        INNER JOIN SYS.DATABASE_PRINCIPALS AS R
+            ON RM.ROLE_PRINCIPAL_ID = R.PRINCIPAL_ID
+        INNER JOIN SYS.DATABASE_PRINCIPALS AS U
+            ON RM.MEMBER_PRINCIPAL_ID = U.PRINCIPAL_ID
         WHERE
-            r.name = N'DBA'
-            AND u.name = N'USERDBA'
+            R.NAME = N'DBA'
+            AND U.NAME = N'USERDBA'
     )
-BEGIN
-    ALTER ROLE DBA ADD MEMBER USERDBA;
-END;
+    BEGIN
+        ALTER ROLE DBA ADD MEMBER USERDBA;
+    END;
 GO
