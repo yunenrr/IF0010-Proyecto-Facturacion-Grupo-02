@@ -13,9 +13,9 @@ IF
         SELECT 1
         FROM sys.server_principals
         WHERE
-            NAME = N'LOGOPERATIVO'
+            name = N'LOGOPERATIVO'
     )
-        THROW 51007, 'Ya existe el login LOGOPERATIVO; no se sobreescribe', 1;
+    THROW 51007, 'Ya existe el login LOGOPERATIVO; no se sobreescribe', 1;
 
 DECLARE @COMANDO NVARCHAR(MAX);
 SET @COMANDO = N'CREATE LOGIN LOGOPERATIVO WITH PASSWORD = '
