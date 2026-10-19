@@ -4,14 +4,14 @@ GO
 IF
     NOT EXISTS (
         SELECT 1
-        FROM sys.database_role_members rm
+        FROM SYS.DATABASE_ROLE_MEMBERS RM
         JOIN
-            sys.database_principals r ON rm.role_principal_id = r.principal_id
+            SYS.DATABASE_PRINCIPALS R ON RM.ROLE_PRINCIPAL_ID = R.PRINCIPAL_ID
         JOIN
-            sys.database_principals u ON rm.member_principal_id = u.principal_id
+            SYS.DATABASE_PRINCIPALS U ON RM.MEMBER_PRINCIPAL_ID = U.PRINCIPAL_ID
         WHERE
-            r.name = N'ADMINISTRADOR'
-            AND u.name = N'USERADMINISTRADOR'
+            R.NAME = N'ADMINISTRADOR'
+            AND U.NAME = N'USERADMINISTRADOR'
     )
 BEGIN
     ALTER ROLE ADMINISTRADOR ADD MEMBER USERADMINISTRADOR;
