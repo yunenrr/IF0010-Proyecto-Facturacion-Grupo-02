@@ -22,7 +22,7 @@ RETURN (
         A.ID_AUDITORIA,
         A.TABLA_AFECTADA,
         A.LLAVE_PRIMARIA,
-        A.OPERACION,
+        A.ID_OPERACION,
         A.CAMPO_MODIFICADO,
         A.VALOR_ANTERIOR,
         A.VALOR_NUEVO,
