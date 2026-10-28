@@ -1,0 +1,109 @@
+USE FACTURACIONSOLUCIONESMAGNIFICAS;
+GO
+
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'TR_PRODUCTO_AUDITORIA'
+            AND TYPE = 'TR'
+    )
+    BEGIN
+        DROP TRIGGER DBO.TR_PRODUCTO_AUDITORIA;
+    END;
+GO
+
+CREATE TRIGGER DBO.TR_PRODUCTO_AUDITORIA
+ON DBO.PRODUCTO
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO DBO.AUDITORIASISTEMA (
+        TABLA_AFECTADA,
+        LLAVE_PRIMARIA,
+        ID_OPERACION,
+        CAMPO_MODIFICADO,
+        VALOR_ANTERIOR,
+        VALOR_NUEVO
+    )
+    SELECT
+        'PRODUCTO',
+        CAST(I.CODIGO_ID AS VARCHAR(50)),
+        1,
+        'REGISTRO',
+        'N/A',
+        CONCAT(I.CODIGO_ID, ' | ', I.DESCRIPCION)
+    FROM INSERTED AS I
+    WHERE NOT EXISTS (SELECT 1 FROM DELETED);
+
+    INSERT INTO DBO.AUDITORIASISTEMA (
+        TABLA_AFECTADA,
+        LLAVE_PRIMARIA,
+        ID_OPERACION,
+        CAMPO_MODIFICADO,
+        VALOR_ANTERIOR,
+        VALOR_NUEVO
+    )
+    SELECT
+        'PRODUCTO',
+        CAST(D.CODIGO_ID AS VARCHAR(50)),
+        3,
+        'REGISTRO',
+        CONCAT(D.CODIGO_ID, ' | ', D.DESCRIPCION),
+        'N/A'
+    FROM DELETED AS D
+    WHERE NOT EXISTS (SELECT 1 FROM INSERTED);
+
+    INSERT INTO DBO.AUDITORIASISTEMA (
+        TABLA_AFECTADA,
+        LLAVE_PRIMARIA,
+        ID_OPERACION,
+        CAMPO_MODIFICADO,
+        VALOR_ANTERIOR,
+        VALOR_NUEVO
+    )
+    SELECT
+        'PRODUCTO',
+        CAST(I.CODIGO_ID AS VARCHAR(50)),
+        2,
+        C.CAMPO,
+        C.ANTERIOR,
+        C.NUEVO
+    FROM INSERTED AS I
+    INNER JOIN DELETED AS D
+        ON I.CODIGO_ID = D.CODIGO_ID
+    CROSS APPLY (
+        VALUES
+            ('DESCRIPCION', D.DESCRIPCION, I.DESCRIPCION),
+            (
+                'PRECIO_UNITARIO',
+                CAST(D.PRECIO_UNITARIO AS VARCHAR(50)),
+                CAST(I.PRECIO_UNITARIO AS VARCHAR(50))
+            ),
+            (
+                'PORCENTAJE_IMPUESTO',
+                CAST(D.PORCENTAJE_IMPUESTO AS VARCHAR(50)),
+                CAST(I.PORCENTAJE_IMPUESTO AS VARCHAR(50))
+            ),
+            (
+                'STOCK_ACTUAL',
+                CAST(D.STOCK_ACTUAL AS VARCHAR(50)),
+                CAST(I.STOCK_ACTUAL AS VARCHAR(50))
+            ),
+            (
+                'STOCK_MINIMO',
+                CAST(D.STOCK_MINIMO AS VARCHAR(50)),
+                CAST(I.STOCK_MINIMO AS VARCHAR(50))
+            ),
+            (
+                'ESTADO',
+                CAST(D.ESTADO AS VARCHAR(50)),
+                CAST(I.ESTADO AS VARCHAR(50))
+            )
+    ) AS C(CAMPO, ANTERIOR, NUEVO)
+    WHERE C.ANTERIOR <> C.NUEVO;
+END;
+GO
