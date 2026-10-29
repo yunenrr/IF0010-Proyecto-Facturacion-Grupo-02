@@ -43,6 +43,7 @@ BEGIN
         ID_ESTADO INT,
         FECHA_EMISION DATETIME2,
         SUBTOTAL DECIMAL(18, 2) DEFAULT 0,
+        TOTAL_DESCUENTOS DECIMAL(18, 2) DEFAULT 0,
         TOTAL_IMPUESTOS DECIMAL(18, 2) DEFAULT 0,
         MONTO_TOTAL DECIMAL(18, 2) DEFAULT 0
     );
@@ -54,8 +55,10 @@ BEGIN
         DESCRIPCION VARCHAR(255),
         CANTIDAD DECIMAL(12, 2),
         PRECIO_UNITARIO DECIMAL(18, 2),
+        PORCENTAJE_DESCUENTO DECIMAL(5, 2),
         PORCENTAJE_IMPUESTO DECIMAL(5, 2),
         SUBTOTAL_LINEA DECIMAL(18, 2),
+        MONTO_DESCUENTO DECIMAL(18, 2),
         MONTO_IMPUESTO DECIMAL(18, 2),
         MONTO_TOTAL_LINEA DECIMAL(18, 2)
     );
@@ -73,6 +76,17 @@ BEGIN
                 TRUNCATE TABLE #LoteFacturas;
                 TRUNCATE TABLE #LoteDetalles;
 
+                WITH FECHAS AS (
+                    SELECT
+                        N.N,
+                        DATEADD(
+                            SECOND,
+                            (N.N + @FacturasProcesadas) * 60,
+                            @FechaInicio
+                        ) AS FECHA
+                    FROM #Numeros AS N
+                )
+
                 INSERT INTO #LoteFacturas (
                     CODIGO_FACTURA,
                     ID_EMPRESA,
@@ -84,50 +98,24 @@ BEGIN
                     FECHA_EMISION
                 )
                 SELECT
-                    @MaxCodigoActual + @FacturasProcesadas + N.N
+                    @MaxCodigoActual + @FacturasProcesadas + FE.N
                         AS CODIGO_FACTURA,
-                    ((N.N * 17) % 100) + 1 AS ID_EMPRESA,
-                    ((N.N * 31) % 50000) + 1 AS ID_CLIENTE,
+                    ((FE.N * 17) % 100) + 1 AS ID_EMPRESA,
+                    ((FE.N * 31) % 50000) + 1 AS ID_CLIENTE,
                     TD.ID_TIPO_DOCUMENTO,
                     CASE
-                        WHEN (N.N % 2) = 0 THEN 'CRC'
+                        WHEN (FE.N % 2) = 0 THEN 'CRC'
                         ELSE 'USD'
                     END AS CODIGO_DIVISA,
-                    ((N.N % 4) + 1) AS ID_ESTADO,
-                    CONCAT(
-                        CONVERT(
-                            VARCHAR(8),
-                            DATEADD(
-                                SECOND,
-                                (N.N + @FacturasProcesadas) * 60,
-                                @FechaInicio
-                            ),
-                            112
-                        ),
-                        REPLACE(
-                            CONVERT(
-                                VARCHAR(8),
-                                DATEADD(
-                                    SECOND,
-                                    (N.N + @FacturasProcesadas) * 60,
-                                    @FechaInicio
-                                ),
-                                108
-                            ),
-                            ':',
-                            ''
-                        ),
-                        '-',
-                        TD.DESCRIPCION_TIPO_DOCUMENTO
+                    ((FE.N % 4) + 1) AS ID_ESTADO,
+                    DBO.FN_GENERARCLAVECOMPROBANTE(
+                        FE.FECHA,
+                        TD.ID_TIPO_DOCUMENTO
                     ) AS IDENTIFICADOR_COMPROBANTE,
-                    DATEADD(
-                        SECOND,
-                        (N.N + @FacturasProcesadas) * 60,
-                        @FechaInicio
-                    ) AS FECHA_EMISION
-                FROM #Numeros AS N
+                    FE.FECHA AS FECHA_EMISION
+                FROM FECHAS AS FE
                 INNER JOIN DBO.TIPODOCUMENTO AS TD
-                    ON ((N.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO;
+                    ON ((FE.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO;
 
                 WITH LINEAS AS (
                     SELECT
@@ -136,7 +124,9 @@ BEGIN
                         ((F.CODIGO_FACTURA * 13 + X.NUMLINEA * 7) % 1000)
                         + 1 AS CODIGOPROD,
                         ((F.CODIGO_FACTURA * 3 + X.NUMLINEA) % 5)
-                        + 1 AS CANT
+                        + 1 AS CANT,
+                        ((F.CODIGO_FACTURA + X.NUMLINEA) % 4) * 5
+                            AS PORCDESC
                     FROM #LoteFacturas AS F
                     CROSS JOIN (
                         VALUES (1), (2), (3), (4), (5)
@@ -160,8 +150,10 @@ BEGIN
                     DESCRIPCION,
                     CANTIDAD,
                     PRECIO_UNITARIO,
+                    PORCENTAJE_DESCUENTO,
                     PORCENTAJE_IMPUESTO,
                     SUBTOTAL_LINEA,
+                    MONTO_DESCUENTO,
                     MONTO_IMPUESTO,
                     MONTO_TOTAL_LINEA
                 )
@@ -172,6 +164,7 @@ BEGIN
                     P.DESCRIPCION,
                     L.CANT,
                     P.PRECIO_UNITARIO,
+                    L.PORCDESC,
                     P.PORCENTAJE_IMPUESTO,
                     CONVERT(
                         DECIMAL(18, 2),
@@ -179,12 +172,18 @@ BEGIN
                     ) AS SUBTOTAL_LINEA,
                     CONVERT(
                         DECIMAL(18, 2),
+                        L.CANT * P.PRECIO_UNITARIO * L.PORCDESC / 100.00
+                    ) AS MONTO_DESCUENTO,
+                    CONVERT(
+                        DECIMAL(18, 2),
                         L.CANT * P.PRECIO_UNITARIO
+                        * (1 - L.PORCDESC / 100.00)
                         * P.PORCENTAJE_IMPUESTO / 100.00
                     ) AS MONTO_IMPUESTO,
                     CONVERT(
                         DECIMAL(18, 2),
                         L.CANT * P.PRECIO_UNITARIO
+                        * (1 - L.PORCDESC / 100.00)
                         * (1 + P.PORCENTAJE_IMPUESTO / 100.00)
                     ) AS MONTO_TOTAL_LINEA
                 FROM LINEAS AS L
@@ -195,6 +194,7 @@ BEGIN
                     SELECT
                         CODIGO_FACTURA,
                         SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
+                        SUM(MONTO_DESCUENTO) AS DESCUENTOSUM,
                         SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
                         SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
                     FROM #LoteDetalles
@@ -204,6 +204,7 @@ BEGIN
                 UPDATE F
                 SET
                     F.SUBTOTAL = T.SUBTOTALSUM,
+                    F.TOTAL_DESCUENTOS = T.DESCUENTOSUM,
                     F.TOTAL_IMPUESTOS = T.IMPUESTOSUM,
                     F.MONTO_TOTAL = T.TOTALSUM
                 FROM #LoteFacturas AS F
@@ -220,6 +221,7 @@ BEGIN
                     ID_ESTADO,
                     FECHA_EMISION,
                     SUBTOTAL,
+                    TOTAL_DESCUENTOS,
                     TOTAL_IMPUESTOS,
                     MONTO_TOTAL
                 )
@@ -233,6 +235,7 @@ BEGIN
                     ID_ESTADO,
                     FECHA_EMISION,
                     SUBTOTAL,
+                    TOTAL_DESCUENTOS,
                     TOTAL_IMPUESTOS,
                     MONTO_TOTAL
                 FROM #LoteFacturas;
@@ -244,8 +247,10 @@ BEGIN
                     DESCRIPCION,
                     CANTIDAD,
                     PRECIO_UNITARIO,
+                    PORCENTAJE_DESCUENTO,
                     PORCENTAJE_IMPUESTO,
                     SUBTOTAL_LINEA,
+                    MONTO_DESCUENTO,
                     MONTO_IMPUESTO,
                     MONTO_TOTAL_LINEA
                 )
@@ -256,8 +261,10 @@ BEGIN
                     DESCRIPCION,
                     CANTIDAD,
                     PRECIO_UNITARIO,
+                    PORCENTAJE_DESCUENTO,
                     PORCENTAJE_IMPUESTO,
                     SUBTOTAL_LINEA,
+                    MONTO_DESCUENTO,
                     MONTO_IMPUESTO,
                     MONTO_TOTAL_LINEA
                 FROM #LoteDetalles;

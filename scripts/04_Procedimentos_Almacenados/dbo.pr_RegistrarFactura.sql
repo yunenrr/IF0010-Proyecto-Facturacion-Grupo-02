@@ -15,7 +15,7 @@ IF
 GO
 
 CREATE PROCEDURE DBO.PR_REGISTRARFACTURA
-    @IDENTIFICADOR_COMPROBANTE VARCHAR(30),
+    @FECHA_EMISION DATETIME2,
     @ID_EMPRESA INT,
     @ID_CLIENTE INT,
     @ID_TIPO_DOCUMENTO INT,
@@ -28,20 +28,6 @@ BEGIN
 
     BEGIN TRY
         BEGIN TRANSACTION;
-
-        IF
-            EXISTS (
-                SELECT 1
-                FROM DBO.FACTURA
-                WHERE
-                    IDENTIFICADOR_COMPROBANTE = @IDENTIFICADOR_COMPROBANTE
-            )
-            BEGIN
-                THROW
-                50053,
-                'Ya existe una factura con ese identificador de comprobante.',
-                1;
-            END;
 
         IF
             NOT EXISTS (
@@ -101,27 +87,23 @@ BEGIN
                 THROW 50058, 'El estado especificado no existe.', 1;
             END;
 
-        DECLARE @DESCRIPCIONTIPO VARCHAR(50);
+        DECLARE @CLAVE VARCHAR(100);
 
-        SELECT @DESCRIPCIONTIPO = DESCRIPCION_TIPO_DOCUMENTO
-        FROM DBO.TIPODOCUMENTO
-        WHERE ID_TIPO_DOCUMENTO = @ID_TIPO_DOCUMENTO;
+        SET @CLAVE = DBO.FN_GENERARCLAVECOMPROBANTE(
+            @FECHA_EMISION,
+            @ID_TIPO_DOCUMENTO
+        );
 
         IF
-            LEN(@IDENTIFICADOR_COMPROBANTE)
-            <> 15 + LEN(@DESCRIPCIONTIPO)
-            OR TRY_CAST(
-                LEFT(@IDENTIFICADOR_COMPROBANTE, 14) AS BIGINT
-            ) IS NULL
-            OR SUBSTRING(@IDENTIFICADOR_COMPROBANTE, 15, 1) <> '-'
-            OR RIGHT(
-                @IDENTIFICADOR_COMPROBANTE,
-                LEN(@DESCRIPCIONTIPO)
-            ) <> @DESCRIPCIONTIPO
+            EXISTS (
+                SELECT 1
+                FROM DBO.FACTURA
+                WHERE IDENTIFICADOR_COMPROBANTE = @CLAVE
+            )
             BEGIN
                 THROW
-                50059,
-                'El formato del identificador es incorrecto.',
+                50053,
+                'Ya existe una factura con ese identificador de comprobante.',
                 1;
             END;
 
@@ -137,16 +119,18 @@ BEGIN
             ID_CLIENTE,
             ID_TIPO_DOCUMENTO,
             CODIGO_DIVISA,
-            ID_ESTADO
+            ID_ESTADO,
+            FECHA_EMISION
         )
         VALUES (
             @NUEVO_CODIGO,
-            @IDENTIFICADOR_COMPROBANTE,
+            @CLAVE,
             @ID_EMPRESA,
             @ID_CLIENTE,
             @ID_TIPO_DOCUMENTO,
             @CODIGO_DIVISA,
-            @ID_ESTADO
+            @ID_ESTADO,
+            @FECHA_EMISION
         );
 
         COMMIT TRANSACTION;

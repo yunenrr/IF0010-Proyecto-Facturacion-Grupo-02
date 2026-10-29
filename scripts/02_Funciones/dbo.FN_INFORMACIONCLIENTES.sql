@@ -1,0 +1,65 @@
+USE FACTURACIONSOLUCIONESMAGNIFICAS;
+GO
+
+IF OBJECT_ID('DBO.FN_INFORMACIONCLIENTES', 'IF') IS NOT NULL
+    BEGIN
+        DROP FUNCTION DBO.FN_INFORMACIONCLIENTES;
+    END;
+GO
+
+CREATE FUNCTION DBO.FN_INFORMACIONCLIENTES(@CEDULA VARCHAR(20))
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT
+        C.ID_CLIENTE,
+        C.CEDULA_CLIENTE,
+        C.NOMBRE,
+        PR.NOMBRE AS PROVINCIA,
+        CA.NOMBRE AS CANTON,
+        DT.NOMBRE AS DISTRITO,
+        DI.SENAS_ADICIONALES,
+        C.FECHA_REGISTRO,
+        CASE LEN(REPLACE(C.CEDULA_CLIENTE, '-', ''))
+            WHEN 9 THEN 'FISICA'
+            WHEN 10 THEN 'JURIDICA'
+            ELSE 'OTRO'
+        END AS TIPO_IDENTIFICACION,
+        CASE
+            WHEN
+                IS_MEMBER(N'ADMINISTRADOR') = 1
+                OR IS_SRVROLEMEMBER(N'sysadmin') = 1
+                THEN C.TELEFONO
+            ELSE CONCAT('XXXX-', RIGHT(C.TELEFONO, 4))
+        END AS TELEFONO,
+        CASE
+            WHEN
+                IS_MEMBER(N'ADMINISTRADOR') = 1
+                OR IS_SRVROLEMEMBER(N'sysadmin') = 1
+                THEN C.CORREO
+            ELSE CONCAT(
+                LEFT(C.CORREO, 1),
+                '***',
+                SUBSTRING(
+                    C.CORREO,
+                    CHARINDEX('@', C.CORREO) - 1,
+                    1
+                ),
+                '@***',
+                RIGHT(C.CORREO, 4)
+            )
+        END AS CORREO
+    FROM DBO.CLIENTE AS C
+    INNER JOIN DBO.DIRECCION AS DI
+        ON C.ID_DIRECCION = DI.ID_DIRECCION
+    INNER JOIN DBO.DISTRITO AS DT
+        ON DI.ID_DISTRITO = DT.ID_DISTRITO
+    INNER JOIN DBO.CANTON AS CA
+        ON DT.ID_CANTON = CA.ID_CANTON
+    INNER JOIN DBO.PROVINCIA AS PR
+        ON CA.ID_PROVINCIA = PR.ID_PROVINCIA
+    WHERE
+        C.CEDULA_CLIENTE = @CEDULA
+);
+GO
