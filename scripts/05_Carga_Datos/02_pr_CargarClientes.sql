@@ -132,7 +132,6 @@ BEGIN
         DECLARE @IDDISTRITO INT;
         DECLARE @CODIGOPROVINCIA INT;
         DECLARE @FILASINSERTADAS INT = 0;
-        DECLARE @NOMBREALEATORIO VARCHAR(70);
         DECLARE @CORREOALEATORIO VARCHAR(75);
         DECLARE @NOMTEMP VARCHAR(30);
         DECLARE @APE1TEMP VARCHAR(30);
@@ -146,6 +145,8 @@ BEGIN
             ID_CLIENTE INT,
             CEDULA_CLIENTE VARCHAR(20),
             NOMBRE VARCHAR(70),
+            PRIMERAPELLIDO VARCHAR(50),
+            SEGUNDOAPELLIDO VARCHAR(50),
             ID_DIRECCION INT,
             TELEFONO VARCHAR(15),
             CORREO VARCHAR(75),
@@ -205,14 +206,6 @@ BEGIN
                 FROM #DOMINIOS
                 ORDER BY NEWID();
 
-                SET
-                    @NOMBREALEATORIO = CONCAT(
-                        @NOMTEMP,
-                        ' ',
-                        @APE1TEMP,
-                        ' ',
-                        @APE2TEMP
-                    );
                 SET @CEDULAPROVINCIAL = CONCAT(
                     CAST(@CODIGOPROVINCIA AS VARCHAR(1)),
                     RIGHT(CONCAT('00000000', @BASECONTADOR + @I), 8)
@@ -235,6 +228,8 @@ BEGIN
                     ID_CLIENTE,
                     CEDULA_CLIENTE,
                     NOMBRE,
+                    PRIMERAPELLIDO,
+                    SEGUNDOAPELLIDO,
                     ID_DIRECCION,
                     TELEFONO,
                     CORREO
@@ -243,6 +238,8 @@ BEGIN
                     INSERTED.ID_CLIENTE,
                     INSERTED.CEDULA_CLIENTE,
                     INSERTED.NOMBRE,
+                    INSERTED.PRIMERAPELLIDO,
+                    INSERTED.SEGUNDOAPELLIDO,
                     INSERTED.ID_DIRECCION,
                     INSERTED.TELEFONO,
                     INSERTED.CORREO,
@@ -251,7 +248,9 @@ BEGIN
                 VALUES (
                     @NUEVOIDCLIENTE,
                     @CEDULAPROVINCIAL,
-                    @NOMBREALEATORIO,
+                    @NOMTEMP,
+                    @APE1TEMP,
+                    @APE2TEMP,
                     @NUEVOIDDIRECCION,
                     CONCAT(
                         CASE WHEN @I % 2 = 0 THEN '8' ELSE '7' END,

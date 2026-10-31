@@ -17,6 +17,8 @@ GO
 CREATE PROCEDURE DBO.PR_INSERTARCLIENTE
     @CEDULA_CLIENTE VARCHAR(20),
     @NOMBRE VARCHAR(70),
+    @PRIMERAPELLIDO VARCHAR(50),
+    @SEGUNDOAPELLIDO VARCHAR(50),
     @ID_DIRECCION INT,
     @TELEFONO VARCHAR(15),
     @CORREO VARCHAR(75)
@@ -57,6 +59,8 @@ BEGIN
             ID_CLIENTE,
             CEDULA_CLIENTE,
             NOMBRE,
+            PRIMERAPELLIDO,
+            SEGUNDOAPELLIDO,
             ID_DIRECCION,
             TELEFONO,
             CORREO
@@ -65,6 +69,8 @@ BEGIN
             @NUEVOIDCLIENTE,
             @CEDULA_CLIENTE,
             @NOMBRE,
+            @PRIMERAPELLIDO,
+            @SEGUNDOAPELLIDO,
             @ID_DIRECCION,
             @TELEFONO,
             @CORREO
