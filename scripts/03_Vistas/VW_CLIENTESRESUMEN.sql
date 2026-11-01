@@ -21,9 +21,9 @@ WITH CONTEOS AS (
         COUNT(*) AS TOTAL,
         SUM(
             CASE
-                WHEN F.FECHA_EMISION
+                    WHEN F.FECHA_EMISION
                     >= DATEADD(MONTH, -6, SYSDATETIME())
-                    THEN 1
+                        THEN 1
                 ELSE 0
             END
         ) AS RECIENTES
