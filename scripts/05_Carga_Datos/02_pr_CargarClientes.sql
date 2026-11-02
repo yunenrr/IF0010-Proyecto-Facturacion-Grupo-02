@@ -34,11 +34,11 @@ BEGIN
         ('Juan'),
         ('Sofía'),
         ('Pedro'),
-        ('Lucía'),
+        ('Sianni'),
         ('Diego'),
         ('Elena'),
         ('Fernando'),
-        ('Valeria'),
+        ('Lourdes'),
         ('José'),
         ('Camila'),
         ('Mateo'),
@@ -47,10 +47,10 @@ BEGIN
         ('Daniela'),
         ('Andrés'),
         ('Natalia'),
-        ('Alejandro'),
+        ('Kary'),
         ('Mariana'),
         ('Esteban'),
-        ('Ximena'),
+        ('Nicolle'),
         ('Sébastian'),
         ('Jimena'),
         ('Adrian'),
@@ -108,11 +108,11 @@ BEGIN
         ('De la iglesia católica 200m Norte y 50m Este'),
         ('Contiguo al Ebais, casa color blanco con rejas negras'),
         ('Del parque central 100m Sur, frente al abastecedor'),
-        ('Condominio Los Azahares, casa #'),
-        ('Urbanización El Pilar, de la pulpería 75m Oeste'),
-        ('Residencial Altamira, 50m Este de la plaza de deportes'),
-        ('Calle principal, contiguo a la escuela primaria'),
-        ('150m Oeste del supermercado local, casa esquina');
+        ('Barrio La susanita casa roja'),
+        ('Urbanización San Rafael, de la pulpería Gaudy 75m Oeste'),
+        ('Residencial Coyol, 50m Este de la plaza de deportes'),
+        ('Calle principal, contiguo a la escuela primaria Jorge Debravo'),
+        ('150m Oeste del supermercado El Genio, casa esquinera');
 
         DECLARE @BASECONTADOR INT;
         SELECT @BASECONTADOR = ISNULL(MAX(ID_CLIENTE), 0)
@@ -206,10 +206,18 @@ BEGIN
                 FROM #DOMINIOS
                 ORDER BY NEWID();
 
-                SET @CEDULAPROVINCIAL = CONCAT(
-                    CAST(@CODIGOPROVINCIA AS VARCHAR(1)),
-                    RIGHT(CONCAT('00000000', @BASECONTADOR + @I), 8)
-                );
+                SET @CEDULAPROVINCIAL = CASE
+                    WHEN @I % 10 = 0
+                        THEN CONCAT(
+                            '3101',
+                            RIGHT(CONCAT('000000', @BASECONTADOR + @I), 6)
+                        )
+                    ELSE CONCAT(
+                        CAST(@CODIGOPROVINCIA AS VARCHAR(1)),
+                        RIGHT(CONCAT('00000000', @BASECONTADOR + @I), 8)
+                    )
+                END;
+
                 SET
                     @CORREOALEATORIO = LOWER(
                         CONCAT(
