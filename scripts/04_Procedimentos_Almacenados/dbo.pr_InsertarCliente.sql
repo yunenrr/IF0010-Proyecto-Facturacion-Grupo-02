@@ -15,7 +15,7 @@ IF
 GO
 
 CREATE PROCEDURE DBO.PR_INSERTARCLIENTE
-    @CEDULA_CLIENTE VARCHAR(20),
+    @CEDULA VARCHAR(20),
     @NOMBRE VARCHAR(70),
     @PRIMER_APELLIDO VARCHAR(50),
     @SEGUNDO_APELLIDO VARCHAR(50),
@@ -34,7 +34,7 @@ BEGIN
             EXISTS (
                 SELECT 1
                 FROM DBO.CLIENTE
-                WHERE CEDULA_CLIENTE = @CEDULA_CLIENTE
+                WHERE CEDULA = @CEDULA
             )
             BEGIN
                 THROW 50014, 'Ya existe un cliente con esta cedula.', 1;
@@ -57,23 +57,30 @@ BEGIN
 
         INSERT INTO DBO.CLIENTE (
             ID_CLIENTE,
-            CEDULA_CLIENTE,
-            NOMBRE,
-            PRIMER_APELLIDO,
-            SEGUNDO_APELLIDO,
+            CEDULA,
             ID_DIRECCION,
             TELEFONO,
             CORREO
         )
         VALUES (
             @NUEVOIDCLIENTE,
-            @CEDULA_CLIENTE,
-            @NOMBRE,
-            @PRIMER_APELLIDO,
-            @SEGUNDO_APELLIDO,
+            @CEDULA,
             @ID_DIRECCION,
             @TELEFONO,
             @CORREO
+        );
+
+        INSERT INTO DBO.CLIENTE_FISICO (
+            ID_CLIENTE,
+            NOMBRE,
+            PRIMER_APELLIDO,
+            SEGUNDO_APELLIDO
+        )
+        VALUES (
+            @NUEVOIDCLIENTE,
+            @NOMBRE,
+            @PRIMER_APELLIDO,
+            @SEGUNDO_APELLIDO
         );
 
         COMMIT TRANSACTION;

@@ -50,7 +50,7 @@ BEGIN
         IF
             EXISTS (
                 SELECT 1
-                FROM DBO.EMPRESAEMISORA
+                FROM DBO.EMPRESA_EMISORA
                 WHERE ID_DIRECCION = @ID_DIRECCION
             )
             BEGIN

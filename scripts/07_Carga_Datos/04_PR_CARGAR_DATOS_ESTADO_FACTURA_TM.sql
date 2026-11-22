@@ -1,19 +1,29 @@
 USE FACTURACIONSOLUCIONESMAGNIFICAS;
 GO
 
-IF OBJECT_ID('DBO.PR_MIGRARESTADOFACTURATMP', 'P') IS NOT NULL
-    DROP PROCEDURE DBO.PR_MIGRARESTADOFACTURATMP;
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_MIGRARESTADOFACTURATMP'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_MIGRARESTADOFACTURATMP;
+    END;
 GO
 
 CREATE PROCEDURE DBO.PR_MIGRARESTADOFACTURATMP
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        INSERT INTO DBO.ESTADOFACTURA (
+        INSERT INTO DBO.ESTADO_FACTURA (
             ID_ESTADO,
             ESTADO,
             DESCRIPCION_ESTADO
@@ -27,15 +37,15 @@ BEGIN
                 VALUES
                 (1, 'BORRADOR', 'Factura en preparación'),
                 (2, 'EMITIDA', 'Factura emitida y enviada'),
-                (3, 'PAGADA', 'Factura cancelada por el cliente'),
+                (3, 'PAGADA', 'Factura pagada por el cliente'),
                 (4, 'CANCELADA', 'Factura anulada o devuelta')
             ) AS ESTADOS(ID_ESTADO, ESTADO, DESCRIPCION_ESTADO)
         WHERE
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.ESTADOFACTURA
+                FROM DBO.ESTADO_FACTURA AS EF
                 WHERE
-                    DBO.ESTADOFACTURA.ID_ESTADO = ESTADOS.ID_ESTADO
+                    EF.ID_ESTADO = ESTADOS.ID_ESTADO
             );
 
         COMMIT TRANSACTION;
@@ -52,9 +62,18 @@ END;
 GO
 
 EXEC DBO.PR_MIGRARESTADOFACTURATMP;
-PRINT 'Carga de catálogo ESTADOFACTURA completada con éxito.';
+PRINT 'Carga de catálogo ESTADO_FACTURA completada con éxito.';
 GO
 
-IF OBJECT_ID('DBO.PR_MIGRARESTADOFACTURATMP', 'P') IS NOT NULL
-    DROP PROCEDURE DBO.PR_MIGRARESTADOFACTURATMP;
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_MIGRARESTADOFACTURATMP'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_MIGRARESTADOFACTURATMP;
+    END;
 GO

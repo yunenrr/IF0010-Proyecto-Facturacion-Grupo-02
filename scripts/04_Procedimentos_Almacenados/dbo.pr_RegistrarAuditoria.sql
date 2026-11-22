@@ -58,7 +58,7 @@ BEGIN
                 SET @USUARIO = SUSER_SNAME();
             END;
 
-        INSERT INTO DBO.AUDITORIASISTEMA (
+        INSERT INTO DBO.AUDITORIA_SISTEMA (
             TABLA_AFECTADA,
             LLAVE_PRIMARIA,
             ID_OPERACION,

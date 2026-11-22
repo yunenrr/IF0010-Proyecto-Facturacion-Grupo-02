@@ -30,29 +30,29 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.DETALLEFACTURA
+                FROM DBO.DETALLE_FACTURA
                 WHERE
                     CODIGO_FACTURA = @CODIGO_FACTURA
                     AND ID_DETALLE = @ID_DETALLE
             )
             BEGIN
-                THROW 50071, 'El detalle especificado no existe.', 1;
+                THROW 50140, 'El detalle especificado no existe.', 1;
             END;
 
         IF @CANTIDAD <= 0
             BEGIN
-                THROW 50072, 'La cantidad debe ser mayor a cero.', 1;
+                THROW 50141, 'La cantidad debe ser mayor a cero.', 1;
             END;
 
         IF @PORCENTAJE_DESCUENTO NOT BETWEEN 0 AND 100
             BEGIN
                 THROW
-                50073,
+                50142,
                 'El porcentaje de descuento debe estar entre 0 y 100.',
                 1;
             END;
 
-        UPDATE DBO.DETALLEFACTURA
+        UPDATE DBO.DETALLE_FACTURA
         SET
             CANTIDAD = @CANTIDAD,
             PORCENTAJE_DESCUENTO = @PORCENTAJE_DESCUENTO,
@@ -78,6 +78,18 @@ BEGIN
             CODIGO_FACTURA = @CODIGO_FACTURA
             AND ID_DETALLE = @ID_DETALLE;
 
+        WITH TOTALES AS (
+            SELECT
+                CODIGO_FACTURA,
+                SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
+                SUM(MONTO_DESCUENTO) AS DESCUENTOSUM,
+                SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
+                SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
+            FROM DBO.DETALLE_FACTURA
+            WHERE CODIGO_FACTURA = @CODIGO_FACTURA
+            GROUP BY CODIGO_FACTURA
+        )
+
         UPDATE F
         SET
             F.SUBTOTAL = T.SUBTOTALSUM,
@@ -86,17 +98,7 @@ BEGIN
             F.MONTO_TOTAL = T.TOTALSUM,
             F.UPDATED_AT = SYSDATETIME()
         FROM DBO.FACTURA AS F
-        INNER JOIN (
-            SELECT
-                CODIGO_FACTURA,
-                SUM(SUBTOTAL_LINEA) AS SUBTOTALSUM,
-                SUM(MONTO_DESCUENTO) AS DESCUENTOSUM,
-                SUM(MONTO_IMPUESTO) AS IMPUESTOSUM,
-                SUM(MONTO_TOTAL_LINEA) AS TOTALSUM
-            FROM DBO.DETALLEFACTURA
-            WHERE CODIGO_FACTURA = @CODIGO_FACTURA
-            GROUP BY CODIGO_FACTURA
-        ) AS T
+        INNER JOIN TOTALES AS T
             ON F.CODIGO_FACTURA = T.CODIGO_FACTURA;
 
         COMMIT TRANSACTION;

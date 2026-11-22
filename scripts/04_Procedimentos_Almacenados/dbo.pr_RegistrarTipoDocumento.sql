@@ -28,12 +28,12 @@ BEGIN
         IF
             EXISTS (
                 SELECT 1
-                FROM DBO.TIPODOCUMENTO
+                FROM DBO.TIPO_DOCUMENTO
                 WHERE ID_TIPO_DOCUMENTO = @ID_TIPO_DOCUMENTO
             )
             BEGIN
                 THROW
-                50015,
+                50135,
                 'El ID del tipo de documento ya se encuentra registrado.',
                 1;
             END;
@@ -43,12 +43,12 @@ BEGIN
             OR TRIM(@DESCRIPCION_TIPO_DOCUMENTO) = ''
             BEGIN
                 THROW
-                50016,
+                50136,
                 'La descripción del tipo de documento no puede estar vacía.',
                 1;
             END;
 
-        INSERT INTO DBO.TIPODOCUMENTO (
+        INSERT INTO DBO.TIPO_DOCUMENTO (
             ID_TIPO_DOCUMENTO,
             DESCRIPCION_TIPO_DOCUMENTO
         )

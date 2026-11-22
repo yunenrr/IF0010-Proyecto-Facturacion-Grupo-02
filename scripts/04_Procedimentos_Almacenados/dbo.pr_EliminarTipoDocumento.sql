@@ -27,11 +27,12 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.TIPODOCUMENTO
+                FROM DBO.TIPO_DOCUMENTO
                 WHERE ID_TIPO_DOCUMENTO = @ID_TIPO_DOCUMENTO
             )
             BEGIN
-                THROW 50110,
+                THROW
+                50110,
                 'El tipo de documento especificado no existe.',
                 1;
             END;
@@ -45,12 +46,11 @@ BEGIN
             BEGIN
                 THROW
                 50111,
-                'No se puede eliminar:
-                el tipo de documento está asociado a facturas.',
+                'No se puede eliminar: el tipo de documento tiene facturas.',
                 1;
             END;
 
-        DELETE FROM DBO.TIPODOCUMENTO
+        DELETE FROM DBO.TIPO_DOCUMENTO
         WHERE
             ID_TIPO_DOCUMENTO = @ID_TIPO_DOCUMENTO;
 

@@ -33,7 +33,7 @@ BEGIN
         IF
             EXISTS (
                 SELECT 1
-                FROM DBO.ESTADOFACTURA
+                FROM DBO.ESTADO_FACTURA
                 WHERE ESTADO = @ESTADO
             )
             BEGIN
@@ -51,31 +51,34 @@ BEGIN
                 1;
             END;
 
-        INSERT INTO DBO.ESTADOFACTURA (
+        SELECT @NUEVO_ID_ESTADO = ISNULL(MAX(ID_ESTADO), 0) + 1
+        FROM DBO.ESTADO_FACTURA;
+
+        INSERT INTO DBO.ESTADO_FACTURA (
+            ID_ESTADO,
             ESTADO,
             DESCRIPCION_ESTADO
         )
         VALUES (
+            @NUEVO_ID_ESTADO,
             @ESTADO,
             @DESCRIPCION_ESTADO
         );
 
         IF @@ROWCOUNT = 0
             BEGIN
-                THROW 50013, 'No se pudo hacer el registro', 1;
+                THROW 50134, 'No se pudo hacer el registro', 1;
             END;
-
-        SET @NUEVO_ID_ESTADO = SCOPE_IDENTITY();
 
         COMMIT TRANSACTION;
 
         SELECT
-            ID_ESTADO,
-            ESTADO,
-            DESCRIPCION_ESTADO
-        FROM DBO.ESTADOFACTURA
+            EF.ID_ESTADO,
+            EF.ESTADO,
+            EF.DESCRIPCION_ESTADO
+        FROM DBO.ESTADO_FACTURA AS EF
         WHERE
-            ID_ESTADO = @NUEVO_ID_ESTADO;
+            EF.ID_ESTADO = @NUEVO_ID_ESTADO;
     END TRY
     BEGIN CATCH
         IF XACT_STATE() <> 0

@@ -32,7 +32,7 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.EMPRESAEMISORA
+                FROM DBO.EMPRESA_EMISORA
                 WHERE
                     ID_EMPRESA = @ID_EMPRESA
                     AND ACTIVA = 1
@@ -57,7 +57,7 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.TIPODOCUMENTO
+                FROM DBO.TIPO_DOCUMENTO
                 WHERE ID_TIPO_DOCUMENTO = @ID_TIPO_DOCUMENTO
             )
             BEGIN
@@ -80,7 +80,7 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.ESTADOFACTURA
+                FROM DBO.ESTADO_FACTURA
                 WHERE ID_ESTADO = @ID_ESTADO
             )
             BEGIN

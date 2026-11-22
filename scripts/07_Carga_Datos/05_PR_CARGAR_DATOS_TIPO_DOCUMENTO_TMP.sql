@@ -23,7 +23,7 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        INSERT INTO DBO.TIPODOCUMENTO (
+        INSERT INTO DBO.TIPO_DOCUMENTO (
             ID_TIPO_DOCUMENTO,
             DESCRIPCION_TIPO_DOCUMENTO
         )
@@ -40,7 +40,7 @@ BEGIN
         WHERE
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.TIPODOCUMENTO AS TD
+                FROM DBO.TIPO_DOCUMENTO AS TD
                 WHERE
                     TD.ID_TIPO_DOCUMENTO = T.ID_TIPO_DOCUMENTO
             );
@@ -59,7 +59,7 @@ END;
 GO
 
 EXEC DBO.PR_CARGARDATOSTIPODOCUMENTOTMP;
-PRINT 'Carga de catálogo TIPODOCUMENTO completada con éxito.';
+PRINT 'Carga de catálogo TIPO_DOCUMENTO completada con éxito.';
 GO
 
 IF

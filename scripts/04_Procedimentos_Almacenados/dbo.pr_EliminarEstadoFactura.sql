@@ -27,7 +27,7 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.ESTADOFACTURA
+                FROM DBO.ESTADO_FACTURA
                 WHERE ID_ESTADO = @ID_ESTADO
             )
             BEGIN
@@ -47,7 +47,7 @@ BEGIN
                 1;
             END;
 
-        DELETE FROM DBO.ESTADOFACTURA
+        DELETE FROM DBO.ESTADO_FACTURA
         WHERE
             ID_ESTADO = @ID_ESTADO;
 

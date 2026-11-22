@@ -17,7 +17,7 @@ GO
 CREATE PROCEDURE DBO.PR_ACTUALIZAREMPRESAEMISORA
     @IDEMPRESA INT,
     @CEDULA VARCHAR(20),
-    @NOMBRECOMERCIALL VARCHAR(150),
+    @NOMBRECOMERCIAL VARCHAR(150),
     @RAZONSOCIAL VARCHAR(150),
     @IDDIRECCION INT,
     @TELEFONO VARCHAR(20),
@@ -34,7 +34,7 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.EMPRESAEMISORA
+                FROM DBO.EMPRESA_EMISORA
                 WHERE ID_EMPRESA = @IDEMPRESA
             )
             BEGIN
@@ -47,7 +47,7 @@ BEGIN
         IF
             EXISTS (
                 SELECT 1
-                FROM DBO.EMPRESAEMISORA
+                FROM DBO.EMPRESA_EMISORA
                 WHERE
                     CEDULA = @CEDULA
                     AND ID_EMPRESA <> @IDEMPRESA
@@ -63,7 +63,7 @@ BEGIN
                 WHERE ID_DIRECCION = @IDDIRECCION
             )
             BEGIN
-                THROW 50001, 'El ID de dirección proporcionado no existe.', 1;
+                THROW 50143, 'El ID de dirección proporcionado no existe.', 1;
             END;
 
         IF @CORREO NOT LIKE '%_@__%._%'
@@ -74,14 +74,14 @@ BEGIN
                 1;
             END;
 
-        UPDATE DBO.EMPRESAEMISORA
+        UPDATE DBO.EMPRESA_EMISORA
         SET
-            CEDULA = TRIM(TRIM(@CEDULA)),
-            NOMBRE_COMERCIAL = TRIM(TRIM(@NOMBRECOMERCIALL)),
-            RAZON_SOCIAL = TRIM(TRIM(@RAZONSOCIAL)),
+            CEDULA = TRIM(@CEDULA),
+            NOMBRE_COMERCIAL = TRIM(@NOMBRECOMERCIAL),
+            RAZON_SOCIAL = TRIM(@RAZONSOCIAL),
             ID_DIRECCION = @IDDIRECCION,
-            TELEFONO = TRIM(TRIM(@TELEFONO)),
-            CORREO = LOWER(TRIM(TRIM(@CORREO))),
+            TELEFONO = TRIM(@TELEFONO),
+            CORREO = LOWER(TRIM(@CORREO)),
             ACTIVA = @ACTIVA
         WHERE
             ID_EMPRESA = @IDEMPRESA;
@@ -107,7 +107,7 @@ BEGIN
             E.CORREO,
             E.FECHA_CREACION,
             E.ACTIVA
-        FROM DBO.EMPRESAEMISORA AS E
+        FROM DBO.EMPRESA_EMISORA AS E
         INNER JOIN DBO.DIRECCION AS D
             ON E.ID_DIRECCION = D.ID_DIRECCION
         INNER JOIN DBO.DISTRITO AS DI

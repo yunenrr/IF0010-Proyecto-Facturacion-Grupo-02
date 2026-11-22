@@ -114,7 +114,7 @@ BEGIN
                     ) AS IDENTIFICADOR_COMPROBANTE,
                     FE.FECHA AS FECHA_EMISION
                 FROM FECHAS AS FE
-                INNER JOIN DBO.TIPODOCUMENTO AS TD
+                INNER JOIN DBO.TIPO_DOCUMENTO AS TD
                     ON ((FE.N % 4) + 1) = TD.ID_TIPO_DOCUMENTO;
 
                 WITH LINEAS AS (
@@ -240,7 +240,7 @@ BEGIN
                     MONTO_TOTAL
                 FROM #LoteFacturas;
 
-                INSERT INTO DBO.DETALLEFACTURA (
+                INSERT INTO DBO.DETALLE_FACTURA (
                     CODIGO_FACTURA,
                     NUMERO_LINEA,
                     CODIGO_PRODUCTO,

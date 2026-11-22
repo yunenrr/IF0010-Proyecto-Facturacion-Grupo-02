@@ -29,12 +29,12 @@ BEGIN
         IF
             NOT EXISTS (
                 SELECT 1
-                FROM DBO.ESTADOFACTURA
+                FROM DBO.ESTADO_FACTURA
                 WHERE ID_ESTADO = @ID_ESTADO
             )
             BEGIN
                 THROW
-                50120,
+                50144,
                 'El estado de factura especificado no existe.',
                 1;
             END;
@@ -42,16 +42,16 @@ BEGIN
         IF
             EXISTS (
                 SELECT 1
-                FROM DBO.ESTADOFACTURA
+                FROM DBO.ESTADO_FACTURA
                 WHERE
                     ESTADO = @ESTADO
                     AND ID_ESTADO <> @ID_ESTADO
             )
             BEGIN
-                THROW 50121, 'Ya existe otro estado con ese nombre.', 1;
+                THROW 50145, 'Ya existe otro estado con ese nombre.', 1;
             END;
 
-        UPDATE DBO.ESTADOFACTURA
+        UPDATE DBO.ESTADO_FACTURA
         SET
             ESTADO = @ESTADO,
             DESCRIPCION_ESTADO = @DESCRIPCION_ESTADO

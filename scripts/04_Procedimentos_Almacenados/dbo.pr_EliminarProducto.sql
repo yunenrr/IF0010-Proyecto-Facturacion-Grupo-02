@@ -33,7 +33,7 @@ BEGIN
             )
             BEGIN
                 THROW
-                50101,
+                50103,
                 'El producto especificado no existe.',
                 1;
             END;
@@ -41,7 +41,7 @@ BEGIN
         IF
             EXISTS (
                 SELECT 1
-                FROM DBO.DETALLEFACTURA
+                FROM DBO.DETALLE_FACTURA
                 WHERE
                     CODIGO_PRODUCTO = @CODIGO_ID
             )
