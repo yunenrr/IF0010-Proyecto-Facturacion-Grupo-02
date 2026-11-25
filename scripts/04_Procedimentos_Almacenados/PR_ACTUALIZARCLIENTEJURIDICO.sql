@@ -1,0 +1,57 @@
+USE FACTURACIONSOLUCIONESMAGNIFICAS;
+GO
+
+IF
+    EXISTS (
+        SELECT 1
+        FROM SYS.OBJECTS
+        WHERE
+            NAME = 'PR_ACTUALIZARCLIENTEJURIDICO'
+            AND TYPE = 'P'
+    )
+    BEGIN
+        DROP PROCEDURE DBO.PR_ACTUALIZARCLIENTEJURIDICO;
+    END;
+GO
+
+CREATE PROCEDURE DBO.PR_ACTUALIZARCLIENTEJURIDICO
+    @ID_CLIENTE INT,
+    @RAZON_SOCIAL VARCHAR(150),
+    @NOMBRE_COMERCIAL VARCHAR(150)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF
+            NOT EXISTS (
+                SELECT 1
+                FROM DBO.CLIENTE_JURIDICO
+                WHERE ID_CLIENTE = @ID_CLIENTE
+            )
+            BEGIN
+                THROW 50151, 'El cliente juridico no existe.', 1;
+            END;
+
+        UPDATE DBO.CLIENTE_JURIDICO
+        SET
+            RAZON_SOCIAL = TRIM(@RAZON_SOCIAL),
+            NOMBRE_COMERCIAL = TRIM(@NOMBRE_COMERCIAL)
+        WHERE
+            ID_CLIENTE = @ID_CLIENTE;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF XACT_STATE() <> 0
+            BEGIN
+                ROLLBACK TRANSACTION;
+            END;
+
+        THROW;
+    END CATCH;
+END;
+GO
